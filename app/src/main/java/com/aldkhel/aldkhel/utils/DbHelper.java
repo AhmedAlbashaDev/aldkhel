@@ -6,7 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.markat.markat.models.Product;
+import com.aldkhel.aldkhel.models.Product;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -137,7 +137,7 @@ public class DbHelper  extends SQLiteOpenHelper {
                 product = new Product();
                 product.setId(cursor.getLong(cursor.getColumnIndex(ProductContract.COL_ID)));
                 product.setName(cursor.getString(cursor.getColumnIndex(ProductContract.COL_NAME)));
-                product.setCategory(cursor.getString(cursor.getColumnIndex(ProductContract.COL_CATEGORYID)));
+//                product.setCategory(cursor.getString(cursor.getColumnIndex(ProductContract.COL_CATEGORYID)));
                 product.setContactPhone(cursor.getString(cursor.getColumnIndex(ProductContract.COL_CONTACT)));
                 product.setCity(cursor.getString(cursor.getColumnIndex(ProductContract.COL_CITY)));
                 product.setMark(cursor.getString(cursor.getColumnIndex(ProductContract.COL_MARK)));

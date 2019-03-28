@@ -1,7 +1,9 @@
 package com.aldkhel.aldkhel;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 
 import com.aldkhel.aldkhel.utils.Consts;
@@ -25,5 +27,15 @@ public class MainActivity extends AppCompatActivity {
                 .build()
         );
         setContentView(R.layout.activity_main);
+
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                startActivity(new Intent(MainActivity.this, null));
+                finish();
+            }
+        }, 2000);
+
     }
 }
