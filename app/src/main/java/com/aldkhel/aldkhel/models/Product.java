@@ -14,7 +14,7 @@ public class Product implements Parcelable {
     private String name;
     private String city;
     private String status;
-    private String offer;
+    private double offer;
     private String mark;
     private double price;
     private String details;
@@ -31,7 +31,7 @@ public class Product implements Parcelable {
         name = in.readString();
         city = in.readString();
         status = in.readString();
-        offer = in.readString();
+        offer = in.readDouble();
         mark = in.readString();
         price = in.readDouble();
         details = in.readString();
@@ -47,7 +47,7 @@ public class Product implements Parcelable {
         dest.writeString(name);
         dest.writeString(city);
         dest.writeString(status);
-        dest.writeString(offer);
+        dest.writeDouble(offer);
         dest.writeString(mark);
         dest.writeDouble(price);
         dest.writeString(details);
@@ -106,11 +106,11 @@ public class Product implements Parcelable {
         this.status = status;
     }
 
-    public String getOffer() {
+    public double getOffer() {
         return offer;
     }
 
-    public void setOffer(String offer) {
+    public void setOffer(double offer) {
         this.offer = offer;
     }
 
@@ -182,7 +182,7 @@ public class Product implements Parcelable {
         product.setMark(json.getString("mark"));
         product.setUseDate(json.getString("use_date"));
         product.setPrice(json.getDouble("price"));
-        product.setOffer(json.getString("offer"));
+        product.setOffer(json.getDouble("offer"));
         product.setChecked(json.getInt("checked") == 1);
         return product;
     }

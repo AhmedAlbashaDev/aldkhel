@@ -1,3 +1,10 @@
 <resources>
-    <string name="app_name">Aldkhel</string>
+    <string name="app_name">الدخيل</string>
+
+    <string name="please_wait">الرجاء الانتظار</string>
+
+    <string name="connection_err">خطأ في الاتصال، الرجاء المحاولة مجددا</string>
+
+    <string name="price_format">%.2f ريال</string>
+
 </resources>
