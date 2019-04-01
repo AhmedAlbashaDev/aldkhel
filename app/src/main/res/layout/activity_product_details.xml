@@ -109,18 +109,18 @@
             android:textStyle="bold"
             android:textSize="18sp"
             android:textColor="@android:color/black"
-            android:text="عدد المشاهدات"/>
+            android:text="@string/seen_count_format"/>
 
         <TextView
             android:layout_gravity="right"
             android:layout_marginTop="5dp"
-            android:id="@+id/tvAvailable"
+            android:id="@+id/tvStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textStyle="bold"
             android:textSize="18sp"
             android:textColor="@android:color/black"
-            android:text="متوفر"/>
+            android:text="@string/status_format"/>
 
 
         <View
@@ -136,6 +136,7 @@
 
 
             <TextView
+                android:id="@+id/tvExtra"
                 android:layout_weight=".5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -152,19 +153,23 @@
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:textColor="@android:color/black"
-                android:text="متوفر"/>
+                android:text="@string/total_price_format"/>
 
         </LinearLayout>
 
 
-        <Button
+        <com.travijuu.numberpicker.library.NumberPicker
+            android:layout_marginTop="5dp"
             android:layout_gravity="center"
-            android:layout_width="200dp"
-            android:layout_height="35dp"
-            android:background="@drawable/button_style"
-            android:textColor="@android:color/white"
-            android:textStyle="bold"
-            android:text="number picker"/>
+            android:id="@+id/npQuantity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            app:min="1"
+            app:max="100"
+            app:value="1"
+            app:unit="1"
+            app:focusable="false" />
 
         <Button
             android:layout_marginTop="5dp"
@@ -180,7 +185,8 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:scrollbars="horizontal"/>
 
         <TextView
             android:layout_gravity="right"

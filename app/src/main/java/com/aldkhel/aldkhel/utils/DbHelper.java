@@ -1,6 +1,5 @@
 package com.aldkhel.aldkhel.utils;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -28,7 +27,6 @@ public class DbHelper  extends SQLiteOpenHelper {
         public static final String COL_STATUS = "status";
         public static final String COL_IMAGE = "image";
         public static final String COL_MARK = "mark";
-        public static final String COL_USEDATE = "use_date";
         public static final String COL_PRICE = "price";
         public static final String COL_CATEGORYID = "category_id";
         public static final String COL_OFFER = "offer";
@@ -50,10 +48,9 @@ public class DbHelper  extends SQLiteOpenHelper {
             + ProductContract.COL_STATUS + " TEXT,"
             + ProductContract.COL_IMAGE + " TEXT,"
             + ProductContract.COL_MARK + " TEXT,"
-            + ProductContract.COL_USEDATE + " TEXT,"
             + ProductContract.COL_PRICE + " INTEGER,"
             + ProductContract.COL_CATEGORYID + " TEXT,"
-            + ProductContract.COL_OFFER + " TEXT,"
+            + ProductContract.COL_OFFER + " REAL,"
             + ProductContract.COL_CHECKED + " TEXT)");
     }
 
@@ -76,26 +73,11 @@ public class DbHelper  extends SQLiteOpenHelper {
             return 1;
         }
 
-
-        ContentValues cv = new ContentValues();
-        cv.put(ProductContract.COL_ID,product.getId());
-        cv.put(ProductContract.COL_NAME,product.getName());
-        cv.put(ProductContract.COL_CITY,product.getCity());
-        cv.put(ProductContract.COL_CONTACT,product.getContactPhone());
-        cv.put(ProductContract.COL_DETAILS,product.getDetails());
-        cv.put(ProductContract.COL_STATUS,product.getStatus());
-        cv.put(ProductContract.COL_IMAGE,product.getImageUrl());
-        cv.put(ProductContract.COL_MARK,product.getMark());
-        cv.put(ProductContract.COL_USEDATE,product.getUseDate());
-        cv.put(ProductContract.COL_PRICE,product.getPrice());
-        cv.put(ProductContract.COL_CATEGORYID,product.getMark());
-        cv.put(ProductContract.COL_OFFER,product.getMark());
-        cv.put(ProductContract.COL_CHECKED,product.getMark());
         // insert new value
         return getWritableDatabase().insert(
                 ProductContract.TABLE_PRODUCTS,
                 null,
-                cv);
+                product.toContentValues());
     }
 
     public long deleteAllProducts() {
@@ -122,7 +104,6 @@ public class DbHelper  extends SQLiteOpenHelper {
                         ProductContract.COL_STATUS,
                         ProductContract.COL_IMAGE,
                         ProductContract.COL_MARK,
-                        ProductContract.COL_USEDATE,
                         ProductContract.COL_PRICE,
                         ProductContract.COL_CATEGORYID,
                         ProductContract.COL_OFFER,
@@ -131,24 +112,8 @@ public class DbHelper  extends SQLiteOpenHelper {
                 null, null, null, null, null);
 
         if (cursor != null && cursor.getCount() > 0) {
-            Product product;
-
             while (cursor.moveToNext()) {
-                product = new Product();
-                product.setId(cursor.getLong(cursor.getColumnIndex(ProductContract.COL_ID)));
-                product.setName(cursor.getString(cursor.getColumnIndex(ProductContract.COL_NAME)));
-//                product.setCategory(cursor.getString(cursor.getColumnIndex(ProductContract.COL_CATEGORYID)));
-                product.setContactPhone(cursor.getString(cursor.getColumnIndex(ProductContract.COL_CONTACT)));
-                product.setCity(cursor.getString(cursor.getColumnIndex(ProductContract.COL_CITY)));
-                product.setMark(cursor.getString(cursor.getColumnIndex(ProductContract.COL_MARK)));
-                product.setOffer(cursor.getString(cursor.getColumnIndex(ProductContract.COL_OFFER)));
-                product.setPrice(cursor.getDouble(cursor.getColumnIndex(ProductContract.COL_PRICE)));
-                product.setImageUrl(cursor.getString(cursor.getColumnIndex(ProductContract.COL_IMAGE)));
-                product.setDetails(cursor.getString(cursor.getColumnIndex(ProductContract.COL_DETAILS)));
-                product.setStatus(cursor.getString(cursor.getColumnIndex(ProductContract.COL_STATUS)));
-                product.setUseDate(cursor.getString(cursor.getColumnIndex(ProductContract.COL_USEDATE)));
-                product.setChecked(false);
-                products.add(product);
+                products.add(Product.fromCursor(cursor));
             }
             cursor.close();
         }

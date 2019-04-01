@@ -1,9 +1,12 @@
 package com.aldkhel.aldkhel.models;
 
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.aldkhel.aldkhel.utils.Consts;
+import com.aldkhel.aldkhel.utils.DbHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,9 +21,7 @@ public class Product implements Parcelable {
     private String mark;
     private double price;
     private String details;
-    private String useDate;
     private String imageUrl;
-    private String contactPhone;
     private boolean checked;
 
     public Product() {}
@@ -35,9 +36,7 @@ public class Product implements Parcelable {
         mark = in.readString();
         price = in.readDouble();
         details = in.readString();
-        useDate = in.readString();
         imageUrl = in.readString();
-        contactPhone = in.readString();
         checked = in.readInt() == 1;
     }
 
@@ -51,9 +50,7 @@ public class Product implements Parcelable {
         dest.writeString(mark);
         dest.writeDouble(price);
         dest.writeString(details);
-        dest.writeString(useDate);
         dest.writeString(imageUrl);
-        dest.writeString(contactPhone);
         dest.writeInt(checked ? 1 : 0);
     }
 
@@ -138,28 +135,12 @@ public class Product implements Parcelable {
         this.details = details;
     }
 
-    public String getUseDate() {
-        return useDate;
-    }
-
-    public void setUseDate(String useDate) {
-        this.useDate = useDate;
-    }
-
     public String getImageUrl() {
         return Consts.BASE_IMAGE + imageUrl;
     }
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
-    }
-
-    public String getContactPhone() {
-        return contactPhone;
-    }
-
-    public void setContactPhone(String contactPhone) {
-        this.contactPhone = contactPhone;
     }
 
     public boolean isChecked() {
@@ -170,17 +151,50 @@ public class Product implements Parcelable {
         this.checked = checked;
     }
 
+    public ContentValues toContentValues() {
+
+        ContentValues cv = new ContentValues();
+        cv.put(DbHelper.ProductContract.COL_ID, getId());
+        cv.put(DbHelper.ProductContract.COL_NAME, getName());
+        cv.put(DbHelper.ProductContract.COL_CITY, getCity());
+        cv.put(DbHelper.ProductContract.COL_DETAILS, getDetails());
+        cv.put(DbHelper.ProductContract.COL_STATUS, getStatus());
+        cv.put(DbHelper.ProductContract.COL_IMAGE, getImageUrl());
+        cv.put(DbHelper.ProductContract.COL_MARK, getMark());
+        cv.put(DbHelper.ProductContract.COL_PRICE, getPrice());
+        cv.put(DbHelper.ProductContract.COL_CATEGORYID, getMark());
+        cv.put(DbHelper.ProductContract.COL_OFFER, getMark());
+        cv.put(DbHelper.ProductContract.COL_CHECKED, getMark());
+
+        return cv;
+    }
+
+    public static Product fromCursor(Cursor cursor) {
+
+        Product product = new Product();
+        product.setId(cursor.getLong(cursor.getColumnIndex(DbHelper.ProductContract.COL_ID)));
+        product.setName(cursor.getString(cursor.getColumnIndex(DbHelper.ProductContract.COL_NAME)));
+//                product.setCategory(cursor.getString(cursor.getColumnIndex(DbHelper.ProductContract.COL_CATEGORYID)));
+        product.setCity(cursor.getString(cursor.getColumnIndex(DbHelper.ProductContract.COL_CITY)));
+        product.setMark(cursor.getString(cursor.getColumnIndex(DbHelper.ProductContract.COL_MARK)));
+        product.setOffer(cursor.getDouble(cursor.getColumnIndex(DbHelper.ProductContract.COL_OFFER)));
+        product.setPrice(cursor.getDouble(cursor.getColumnIndex(DbHelper.ProductContract.COL_PRICE)));
+        product.setImageUrl(cursor.getString(cursor.getColumnIndex(DbHelper.ProductContract.COL_IMAGE)));
+        product.setDetails(cursor.getString(cursor.getColumnIndex(DbHelper.ProductContract.COL_DETAILS)));
+        product.setStatus(cursor.getString(cursor.getColumnIndex(DbHelper.ProductContract.COL_STATUS)));
+        product.setChecked(false);
+        return product;
+    }
+
     public static Product fromJson(JSONObject json) throws JSONException {
         Product product = new Product();
         product.setId(json.getLong("id"));
         product.setName(json.getString("name"));
         product.setCity(json.getString("city"));
-        product.setContactPhone(json.getString("contact_phone"));
         product.setDetails(json.getString("details"));
         product.setStatus(json.getString("status"));
         product.setImageUrl(json.getString("image"));
         product.setMark(json.getString("mark"));
-        product.setUseDate(json.getString("use_date"));
         product.setPrice(json.getDouble("price"));
         product.setOffer(json.getDouble("offer"));
         product.setChecked(json.getInt("checked") == 1);

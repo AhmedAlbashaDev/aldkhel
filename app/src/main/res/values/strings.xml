@@ -6,5 +6,7 @@
     <string name="connection_err">خطأ في الاتصال، الرجاء المحاولة مجددا</string>
 
     <string name="price_format">%.2f ريال</string>
-
+    <string name="seen_count_format">عدد المشاهدات: %d</string>
+    <string name="status_format">حالة التوفر: %s</string>
+    <string name="total_price_format">السعر الاجمالي: %.2f ريال</string>
 </resources>

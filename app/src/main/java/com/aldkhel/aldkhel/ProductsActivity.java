@@ -3,17 +3,14 @@ package com.aldkhel.aldkhel;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aldkhel.aldkhel.adapters.ProductsAdapter;
 import com.aldkhel.aldkhel.models.Product;
 import com.aldkhel.aldkhel.utils.Consts;
 import com.aldkhel.aldkhel.utils.SpacesItemDecoration;
@@ -21,7 +18,6 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONArrayRequestListener;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -89,7 +85,7 @@ public class ProductsActivity extends AppCompatActivity {
                                 products.add(Product.fromJson(response.getJSONObject(i)));
                             }
 
-                            recyclerView.setAdapter(new Adapter());
+                            recyclerView.setAdapter(new ProductsAdapter(ProductsActivity.this, products));
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -106,52 +102,6 @@ public class ProductsActivity extends AppCompatActivity {
 
     }
 
-
-    class Adapter extends RecyclerView.Adapter<Adapter.VH> {
-
-        @NonNull
-        @Override
-        public VH onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-            View v = getLayoutInflater().inflate(R.layout.item_product, viewGroup, false);
-            return new VH(v);
-        }
-
-        @Override
-        public void onBindViewHolder(@NonNull VH vh, int i) {
-
-            final Product product = products.get(i);
-
-            Picasso.with(ProductsActivity.this)
-                    .load(product.getImageUrl())
-                    .into(vh.imageView);
-
-            vh.tvName.setText(product.getName());
-            vh.tvPrice.setText(String.format(getString(R.string.price_format), product.getPrice()));
-        }
-
-        @Override
-        public int getItemCount() {
-            return 0;
-        }
-
-        class VH extends RecyclerView.ViewHolder {
-
-            private final ImageView imageView;
-            private final TextView tvPrice;
-            private final TextView tvOffer;
-            private final TextView tvName;
-
-            VH(View v) {
-                super(v);
-                imageView = v.findViewById(R.id.ivImage);
-                tvPrice = v.findViewById(R.id.tvPrice);
-                tvOffer = v.findViewById(R.id.tvOffer);
-                tvName = v.findViewById(R.id.tvName);
-            }
-
-        }
-
-    }
 
 
 }

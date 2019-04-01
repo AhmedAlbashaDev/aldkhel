@@ -1,9 +1,7 @@
 package com.aldkhel.aldkhel;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 
 import com.aldkhel.aldkhel.utils.Consts;
@@ -11,7 +9,7 @@ import com.aldkhel.aldkhel.utils.Consts;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class MainActivity extends AppCompatActivity {
+public class CartActivity extends AppCompatActivity {
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -26,16 +24,9 @@ public class MainActivity extends AppCompatActivity {
                 .setFontAttrId(R.attr.fontPath)
                 .build()
         );
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_cart);
 
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                startActivity(new Intent(MainActivity.this, HomeActivity.class));
-                finish();
-            }
-        }, 2000);
 
     }
 }
