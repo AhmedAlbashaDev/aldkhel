@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:layout_margin="8dp"
+    android:padding="8dp">
 
     <TextView
+        android:visibility="gone"
         android:id="@+id/tvAvailable"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
@@ -34,7 +39,7 @@
             android:textColor="@android:color/black"
             android:textStyle="bold"
             android:gravity="center"
-            android:textSize="22sp"/>
+            android:textSize="18sp"/>
 
         <TextView
             android:layout_marginTop="5dp"
@@ -44,7 +49,7 @@
             android:text="105"
             android:textStyle="bold"
             android:gravity="center"
-            android:textSize="18sp"/>
+            android:textSize="16sp"/>
         <TextView
             android:layout_marginTop="5dp"
             android:id="@+id/tvOffer"
@@ -54,7 +59,7 @@
             android:textColor="@color/colorAccent"
             android:textStyle="bold"
             android:gravity="center"
-            android:textSize="22sp"/>
+            android:textSize="18sp"/>
 
     </LinearLayout>
 

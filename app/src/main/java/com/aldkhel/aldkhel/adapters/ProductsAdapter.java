@@ -22,6 +22,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.VH> {
 
     private Context context;
     private List<Product> products;
+    private ProductCallback callback;
 
     public ProductsAdapter(Context context, List<Product> products) {
         this.context = context;
@@ -36,10 +37,12 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.VH> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull VH holder, int position) {
+    public void onBindViewHolder(@NonNull final VH holder, int position) {
         final Product product = products.get(position);
         Picasso.with(context)
                 .load(product.getImageUrl())
+                .error(R.drawable.logo)
+                .fit()
                 .into(holder.imageView);
 
         holder.tvName.setText(product.getName());
@@ -54,6 +57,17 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.VH> {
             holder.tvOffer.setVisibility(View.GONE);
         }
 
+        holder.v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                callback.onProductSelected(holder.getAdapterPosition());
+            }
+        });
+
+    }
+
+    public void setCallback(ProductCallback callback) {
+        this.callback = callback;
     }
 
     @Override
@@ -68,9 +82,11 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.VH> {
         private final TextView tvPrice;
         private final TextView tvOffer;
         private final TextView tvAvailable;
+        private final View v;
 
         VH(View v) {
             super(v);
+            this.v = v;
             imageView = v.findViewById(R.id.ivImage);
             tvName = v.findViewById(R.id.tvName);
             tvPrice = v.findViewById(R.id.tvPrice);
@@ -80,6 +96,10 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.VH> {
             tvAvailable.setAnimation(rotate);
         }
 
+    }
+
+    public interface ProductCallback {
+        void onProductSelected(int position);
     }
 
 }

@@ -1,15 +1,24 @@
 package com.aldkhel.aldkhel;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.view.View;
+import android.view.animation.AnimationUtils;
+import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.aldkhel.aldkhel.models.Product;
 import com.aldkhel.aldkhel.utils.Consts;
+import com.squareup.picasso.Picasso;
+import com.travijuu.numberpicker.library.Enums.ActionEnum;
+import com.travijuu.numberpicker.library.Interface.ValueChangedListener;
 import com.travijuu.numberpicker.library.NumberPicker;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -18,20 +27,6 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 public class ProductDetailsActivity extends AppCompatActivity {
 
     private static final String TAG = "ProductDetailsActivity";
-
-    private TextView tvName;
-    private ImageView ivImage;
-    private TextView tvPrice;
-    private TextView tvOffer;
-    private TextView tvType;
-    private TextView tvSeenCount;
-    private TextView tvStatus;
-    private TextView tvPriceTotal;
-    private TextView tvExtra;
-    private NumberPicker npQuantity;
-    private Button bAdd;
-    private RecyclerView recyclerView;
-    private TextView tvDetails;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -48,23 +43,69 @@ public class ProductDetailsActivity extends AppCompatActivity {
         );
         setContentView(R.layout.activity_product_details);
 
-        tvName = findViewById(R.id.tvName);
-        ivImage = findViewById(R.id.ivImage);
-        tvPrice = findViewById(R.id.tvPrice);
-        tvOffer = findViewById(R.id.tvOffer);
-        tvType = findViewById(R.id.tvType);
-        tvSeenCount = findViewById(R.id.tvSeenCount);
-        tvStatus = findViewById(R.id.tvStatus);
-        tvPriceTotal = findViewById(R.id.tvPriceTotal);
-        tvExtra = findViewById(R.id.tvExtra);
-        npQuantity = findViewById(R.id.npQuantity);
-        bAdd = findViewById(R.id.bAdd);
-        tvDetails = findViewById(R.id.tvDetails);
+        final TextView tvName = findViewById(R.id.tvName);
+        final ImageView ivImage = findViewById(R.id.ivImage);
+        final TextView tvPrice = findViewById(R.id.tvPrice);
+        final TextView tvOffer = findViewById(R.id.tvOffer);
+        final TextView tvType = findViewById(R.id.tvType);
+        final TextView tvSeenCount = findViewById(R.id.tvSeenCount);
+        final TextView tvStatus = findViewById(R.id.tvStatus);
+        final TextView tvPriceTotal = findViewById(R.id.tvPriceTotal);
+        final TextView tvExtra = findViewById(R.id.tvExtra);
+        final NumberPicker npQuantity = findViewById(R.id.npQuantity);
+        final Button bAdd = findViewById(R.id.bAdd);
+        final TextView tvDetails = findViewById(R.id.tvDetails);
+        TextView tvAvailable = findViewById(R.id.tvAvailable);
+        RotateAnimation rotate = (RotateAnimation) AnimationUtils.loadAnimation(this, R.anim.rotate_animation);
+        tvAvailable.setAnimation(rotate);
 
-        recyclerView = findViewById(R.id.recycle);
+        final Product product = getIntent().getParcelableExtra("product");
+
+        tvName.setText(product.getName());
+        tvPrice.setText(String.format(getString(R.string.price_format), product.getPrice()));
+        if (product.getOffer() > 0) {
+            tvOffer.setVisibility(View.VISIBLE);
+            tvPrice.setPaintFlags(tvPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        } else {
+            tvOffer.setVisibility(View.GONE);
+        }
+
+        Picasso.with(this)
+                .load(product.getImageUrl())
+                .error(R.drawable.logo)
+                .fit()
+                .into(ivImage);
+
+        tvSeenCount.setText(String.format(getString(R.string.seen_count_format), product.getViewed()));
+        tvStatus.setText(String.format(getString(R.string.status_format), "متوفر"));
+        tvPriceTotal.setText(String.format(getString(R.string.total_price_format),
+                (product.getPrice()*npQuantity.getValue())));
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            tvDetails.setText(Html.fromHtml(product.getDetails(), Html.FROM_HTML_MODE_LEGACY));
+        } else {
+            tvDetails.setText(Html.fromHtml(product.getDetails()));
+        }
+
+//        tvType.setText(String.format(getString(R.string.for)));
+        RecyclerView recyclerView = findViewById(R.id.recycle);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        npQuantity.setValueChangedListener(new ValueChangedListener() {
+            @Override
+            public void valueChanged(int value, ActionEnum action) {
+                tvPriceTotal.setText(String.format(getString(R.string.total_price_format),
+                        (product.getPrice()*value)));
+            }
+        });
+
+        bAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                product.setQuantity(npQuantity.getValue());
+            }
+        });
     }
 
 }

@@ -14,23 +14,19 @@ public class DbHelper  extends SQLiteOpenHelper {
 
 
     private static final String TAG = "DbHelper";
-    private static final String DB_NAME = "markat.db";
+    private static final String DB_NAME = "aldkel.db";
     private static final int VERSION = 1;
 
     public final static class ProductContract {
         static final String TABLE_PRODUCTS = "products";
         public static final String COL_ID = "_id";
         public static final String COL_NAME = "name";
-        public static final String COL_CITY = "city";
-        public static final String COL_CONTACT = "contact_phone";
         public static final String COL_DETAILS = "details";
-        public static final String COL_STATUS = "status";
         public static final String COL_IMAGE = "image";
-        public static final String COL_MARK = "mark";
         public static final String COL_PRICE = "price";
         public static final String COL_CATEGORYID = "category_id";
         public static final String COL_OFFER = "offer";
-        public static final String COL_CHECKED = "checked";
+        public static final String COL_QUANTITY = "quantity";
     }
 
     public DbHelper(Context context) {
@@ -42,16 +38,12 @@ public class DbHelper  extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE IF NOT EXISTS " + ProductContract.TABLE_PRODUCTS + " ("
             + ProductContract.COL_ID + " INTEGER,"
             + ProductContract.COL_NAME + " TEXT,"
-            + ProductContract.COL_CITY + " TEXT,"
-            + ProductContract.COL_CONTACT + " INTEGER,"
             + ProductContract.COL_DETAILS + " TEXT,"
-            + ProductContract.COL_STATUS + " TEXT,"
             + ProductContract.COL_IMAGE + " TEXT,"
-            + ProductContract.COL_MARK + " TEXT,"
             + ProductContract.COL_PRICE + " INTEGER,"
+            + ProductContract.COL_QUANTITY + " INTEGER,"
             + ProductContract.COL_CATEGORYID + " TEXT,"
-            + ProductContract.COL_OFFER + " REAL,"
-            + ProductContract.COL_CHECKED + " TEXT)");
+            + ProductContract.COL_OFFER + " REAL)");
     }
 
     @Override
@@ -98,16 +90,12 @@ public class DbHelper  extends SQLiteOpenHelper {
         Cursor cursor = getReadableDatabase().query(ProductContract.TABLE_PRODUCTS,
                 new String[] {ProductContract.COL_ID,
                         ProductContract.COL_NAME,
-                        ProductContract.COL_CITY,
-                        ProductContract.COL_CONTACT,
                         ProductContract.COL_DETAILS,
-                        ProductContract.COL_STATUS,
                         ProductContract.COL_IMAGE,
-                        ProductContract.COL_MARK,
                         ProductContract.COL_PRICE,
                         ProductContract.COL_CATEGORYID,
                         ProductContract.COL_OFFER,
-                        ProductContract.COL_CHECKED,
+                        ProductContract.COL_QUANTITY,
                 },
                 null, null, null, null, null);
 

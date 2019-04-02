@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -14,7 +13,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.aldkhel.aldkhel.adapters.ProductsAdapter;
@@ -50,11 +48,15 @@ public class HomeActivity extends AppCompatActivity {
     private SliderLayout sliderFooter;
     private TabLayout tabLayout;
 
+    private ProductsAdapter newProductsAdapter;
+    private ProductsAdapter mostSoldProductsAdapter;
+
     private List<Product> products;
     private List<Category> categories;
-    private List<String> categoriesTitle;
 
     private List<Product> productsExtra;
+
+    private long categoryId;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -91,9 +93,10 @@ public class HomeActivity extends AppCompatActivity {
             public void onTabSelected(TabLayout.Tab tab) {
 
                 Log.d(TAG, "Tab " + tab.getPosition() + ": " + tab.getText());
-                //category = tab.getText().toString();
-//                category = category.equals("الكل") ? "" : category;
-//                getProducts();
+                categoryId = categories.get(tab.getPosition()).getId();
+                Log.d(TAG, "Tab Id " + categoryId);
+                getProducts();
+                getProductsFooter();
             }
 
             @Override
@@ -107,15 +110,38 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
+        products = new ArrayList<>();
+
         recyclerView = findViewById(R.id.recycle);
         recyclerView.setHasFixedSize(true);
-        //new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+
+        mostSoldProductsAdapter = new ProductsAdapter(this, products);
+        mostSoldProductsAdapter.setCallback(new ProductsAdapter.ProductCallback() {
+            @Override
+            public void onProductSelected(int position) {
+                Intent intent = new Intent(HomeActivity.this, ProductDetailsActivity.class);
+                intent.putExtra("product", products.get(position));
+                startActivity(intent);
+            }
+        });
+
+        productsExtra = new ArrayList<>();
 
         recyclerViewFooter = findViewById(R.id.recycleFooter);
         recyclerViewFooter.setHasFixedSize(true);
-        recyclerViewFooter.setLayoutManager(new GridLayoutManager(this, 3));
+        recyclerViewFooter.setLayoutManager(new GridLayoutManager(this, 2));
         recyclerViewFooter.addItemDecoration(new SpacesItemDecoration(3));
+
+        newProductsAdapter = new ProductsAdapter(this, productsExtra);
+        newProductsAdapter.setCallback(new ProductsAdapter.ProductCallback() {
+            @Override
+            public void onProductSelected(int position) {
+                Intent intent = new Intent(HomeActivity.this, ProductDetailsActivity.class);
+                intent.putExtra("product", productsExtra.get(position));
+                startActivity(intent);
+            }
+        });
 
         slider = findViewById(R.id.slider);
         slider.setPresetTransformer(SliderLayout.Transformer.Accordion);
@@ -138,6 +164,9 @@ public class HomeActivity extends AppCompatActivity {
         sliderFooter.setDuration(8000);
 
         sliderFooter.addSlider(textSliderView);
+
+        getCategories();
+        getBanners();
     }
 
     private void getCategories() {
@@ -148,7 +177,6 @@ public class HomeActivity extends AppCompatActivity {
         dialog.dismiss();
 
         categories = new ArrayList<>();
-        categoriesTitle = new ArrayList<>();
         tabLayout.removeAllTabs();
 
         AndroidNetworking.get(Consts.API_URL + "show/categories.php")
@@ -166,20 +194,23 @@ public class HomeActivity extends AppCompatActivity {
                                 categories.add(Category.fromJson(response.getJSONObject(i)));
                             }
 
-                            for (int i=categories.size()-1;i >= 0; i--) {
+//                            for (int i=categories.size()-1;i >= 0; i--) {
+//                                tabLayout.addTab(tabLayout.newTab().setText(categories.get(i).getName()));
+//                            }
+
+                            for (int i=0;i< categories.size(); i++) {
                                 tabLayout.addTab(tabLayout.newTab().setText(categories.get(i).getName()));
                             }
 
-                            new Handler().post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    int index = categoriesTitle.size()-1;
-
-                                    tabLayout.getTabAt(index).select();
-                                    int right = ((ViewGroup) tabLayout.getChildAt(0)).getChildAt(index).getRight();
-                                    tabLayout.scrollTo(right,0);
-                                }
-                            });
+//                            new Handler().post(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    int index = categories.size()-1;
+//                                    tabLayout.getTabAt(index).select();
+//                                    int right = ((ViewGroup) tabLayout.getChildAt(0)).getChildAt(index).getRight();
+//                                    tabLayout.scrollTo(right,0);
+//                                }
+//                            });
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -198,9 +229,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private void getProductsFooter() {
 
-        productsExtra = new ArrayList<>();
 
-        AndroidNetworking.get(Consts.API_URL + "show/products.php")
+        AndroidNetworking.get(Consts.API_URL + "show/products_new.php?category_id=" + categoryId)
                 .setPriority(Priority.HIGH)
                 .build()
                 .getAsJSONArray(new JSONArrayRequestListener() {
@@ -210,11 +240,54 @@ public class HomeActivity extends AppCompatActivity {
 
                         try {
 
+                            productsExtra.clear();
+
                             for (int i=0;i<response.length();i++) {
                                 productsExtra.add(Product.fromJson(response.getJSONObject(i)));
                             }
 
-                            recyclerViewFooter.setAdapter(new ProductsAdapter(HomeActivity.this, productsExtra));
+                            recyclerViewFooter.setAdapter(newProductsAdapter);
+                            newProductsAdapter.notifyDataSetChanged();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        error.printStackTrace();
+                        Toast.makeText(HomeActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+    }
+
+    private void getBanners() {
+
+//        final List<String> images = new ArrayList<>();
+
+        AndroidNetworking.get(Consts.API_URL + "show/banners.php")
+                .setPriority(Priority.HIGH)
+                .build()
+                .getAsJSONArray(new JSONArrayRequestListener() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d(TAG, response.toString());
+
+                        try {
+
+                            TextSliderView textSliderView;
+
+                            for (int i=0;i<response.length();i++) {
+//                                images.add(response.getJSONObject(i).getString("image"));
+                                textSliderView = new TextSliderView(HomeActivity.this);
+                                textSliderView
+                                        .description("")
+                                        .image(Consts.BASE_IMAGE + response.getJSONObject(i).getString("image"))
+                                        .setScaleType(BaseSliderView.ScaleType.Fit);
+                                slider.addSlider(textSliderView);
+                            }
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -232,29 +305,31 @@ public class HomeActivity extends AppCompatActivity {
 
     private void getProducts() {
 
-        final ProgressDialog dialog = new ProgressDialog(this);
-        dialog.setMessage(getString(R.string.please_wait));
-        dialog.setCancelable(false);
-        dialog.dismiss();
+//        final ProgressDialog dialog = new ProgressDialog(this);
+//        dialog.setMessage(getString(R.string.please_wait));
+//        dialog.setCancelable(false);
+//        dialog.dismiss();
 
 
-
-        AndroidNetworking.get(Consts.API_URL + "show/products.php")
+        AndroidNetworking.get(Consts.API_URL + "show/products_sold.php?category_id=" + categoryId)
                 .setPriority(Priority.HIGH)
                 .build()
                 .getAsJSONArray(new JSONArrayRequestListener() {
                     @Override
                     public void onResponse(JSONArray response) {
-                        dialog.dismiss();
+//                        dialog.dismiss();
                         Log.d(TAG, response.toString());
 
                         try {
+
+                            products.clear();
 
                             for (int i=0;i<response.length();i++) {
                                 products.add(Product.fromJson(response.getJSONObject(i)));
                             }
 
-                            recyclerView.setAdapter(new ProductsAdapter(HomeActivity.this, products));
+                            recyclerView.setAdapter(mostSoldProductsAdapter);
+                            mostSoldProductsAdapter.notifyDataSetChanged();
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -263,7 +338,7 @@ public class HomeActivity extends AppCompatActivity {
                     }
                     @Override
                     public void onError(ANError error) {
-                        dialog.dismiss();
+//                        dialog.dismiss();
                         error.printStackTrace();
                         Toast.makeText(HomeActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
                     }

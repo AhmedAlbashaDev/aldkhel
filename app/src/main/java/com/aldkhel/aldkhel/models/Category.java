@@ -31,7 +31,7 @@ public class Category {
 
     public static Category fromJson(JSONObject json) throws JSONException {
         Category category = new Category();
-        category.setId(json.getLong("id"));
+        category.setId(json.getLong("category_id"));
         category.setName(json.getString("name"));
         return category;
     }
