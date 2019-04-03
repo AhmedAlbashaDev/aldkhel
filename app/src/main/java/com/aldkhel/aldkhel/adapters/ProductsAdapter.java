@@ -16,6 +16,8 @@ import com.aldkhel.aldkhel.R;
 import com.aldkhel.aldkhel.models.Product;
 import com.squareup.picasso.Picasso;
 
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.VH> {
@@ -63,6 +65,14 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.VH> {
                 callback.onProductSelected(holder.getAdapterPosition());
             }
         });
+
+        try {
+            if (product.getDateAvailable().after(new Date())) {
+                holder.tvAvailable.setVisibility(View.VISIBLE);
+            }
+        } catch (ParseException e) {
+            holder.tvAvailable.setVisibility(View.VISIBLE);
+        }
 
     }
 

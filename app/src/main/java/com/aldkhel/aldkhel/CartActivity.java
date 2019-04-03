@@ -101,6 +101,9 @@ public class CartActivity extends AppCompatActivity {
     }
 
     private void computeTotal() {
+
+        total = 0;
+
         for (Product p : products) {
             if (p.getOffer() > 0) {
                 total += p.getOffer() * p.getQuantity();
@@ -110,6 +113,7 @@ public class CartActivity extends AppCompatActivity {
         }
 
         tvTotal.setText(String.format(getString(R.string.price_format), total));
+
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -165,9 +169,9 @@ public class CartActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull final VH holder, int position) {
             final Product product = products.get(position);
             holder.tvName.setText(product.getName());
-            holder.tvQuantity.setText(String.valueOf(product.getQuantity()));
+            holder.tvQuantity.setText(String.format(getString(R.string.cart_quantity), product.getQuantity()));
             double price = product.getOffer() > 0 ? product.getOffer() : product.getPrice();
-            holder.tvPrice.setText(String.format(getString(R.string.price_format),
+            holder.tvPrice.setText(String.format(getString(R.string.cart_price_format),
                     price));
 
             holder.ivDelete.setOnClickListener(new View.OnClickListener() {
@@ -185,6 +189,9 @@ public class CartActivity extends AppCompatActivity {
                             adapter.notifyItemRemoved(holder.getAdapterPosition());
                             computeTotal();
                             Toast.makeText(CartActivity.this, "تم حذف المنتج", Toast.LENGTH_SHORT).show();
+                            if (products.size() == 0) {
+                                finish();
+                            }
                         }
                     });
                     builder.setNegativeButton("الغاء", new DialogInterface.OnClickListener() {

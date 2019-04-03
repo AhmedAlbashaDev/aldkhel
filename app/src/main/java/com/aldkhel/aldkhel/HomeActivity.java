@@ -58,7 +58,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private List<Product> productsExtra;
 
-    private long categoryId;
+    private Category category;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -89,14 +89,34 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.bSoldMore).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(HomeActivity.this, ProductsActivity.class);
+                i.putExtra("url", Consts.API_URL + "show/products_sold.php?category_id=" + category.getId());
+                i.putExtra("category", category);
+                startActivity(i);
+            }
+        });
+
+        findViewById(R.id.bNewsMore).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(HomeActivity.this, ProductsActivity.class);
+                i.putExtra("url", Consts.API_URL + "show/products_new.php?category_id=" + category.getId());
+                i.putExtra("category", category);
+                startActivity(i);
+            }
+        });
+
         tabLayout = findViewById(R.id.tabLayout);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
 
                 Log.d(TAG, "Tab " + tab.getPosition() + ": " + tab.getText());
-                categoryId = categories.get(tab.getPosition()).getId();
-                Log.d(TAG, "Tab Id " + categoryId);
+                category = categories.get(tab.getPosition());
+                Log.d(TAG, "Tab Id " + category.getId());
                 getProducts();
                 getProductsFooter();
             }
@@ -234,7 +254,7 @@ public class HomeActivity extends AppCompatActivity {
     private void getProductsFooter() {
 
 
-        AndroidNetworking.get(Consts.API_URL + "show/products_new.php?category_id=" + categoryId)
+        AndroidNetworking.get(Consts.API_URL + "show/products_new.php?category_id=" + category.getId())
                 .setPriority(Priority.HIGH)
                 .build()
                 .getAsJSONArray(new JSONArrayRequestListener() {
@@ -315,7 +335,7 @@ public class HomeActivity extends AppCompatActivity {
 //        dialog.dismiss();
 
 
-        AndroidNetworking.get(Consts.API_URL + "show/products_sold.php?category_id=" + categoryId)
+        AndroidNetworking.get(Consts.API_URL + "show/products_sold.php?category_id=" + category.getId())
                 .setPriority(Priority.HIGH)
                 .build()
                 .getAsJSONArray(new JSONArrayRequestListener() {

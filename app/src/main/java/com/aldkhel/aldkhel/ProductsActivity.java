@@ -2,6 +2,7 @@ package com.aldkhel.aldkhel;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aldkhel.aldkhel.adapters.ProductsAdapter;
+import com.aldkhel.aldkhel.models.Category;
 import com.aldkhel.aldkhel.models.Product;
 import com.aldkhel.aldkhel.utils.Consts;
 import com.aldkhel.aldkhel.utils.SpacesItemDecoration;
@@ -34,6 +36,7 @@ public class ProductsActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private List<Product> products;
+    private ProductsAdapter adapter;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -52,23 +55,39 @@ public class ProductsActivity extends AppCompatActivity {
 
         products = new ArrayList<>();
 
+        Category category = getIntent().getParcelableExtra("category");
+
         TextView tvCategory = findViewById(R.id.tvCategory);
+        tvCategory.setText(category.getName());
+
 
         recyclerView = findViewById(R.id.recycle);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         recyclerView.addItemDecoration(new SpacesItemDecoration(3));
 
+        adapter = new ProductsAdapter(this, products);
+        adapter.setCallback(new ProductsAdapter.ProductCallback() {
+            @Override
+            public void onProductSelected(int position) {
+                Intent intent = new Intent(ProductsActivity.this, ProductDetailsActivity.class);
+                intent.putExtra("product", products.get(position));
+                startActivity(intent);
+            }
+        });
+
+        getProducts(getIntent().getStringExtra("url"));
+
     }
 
-    private void getProducts() {
+    private void getProducts(String url) {
 
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setMessage(getString(R.string.please_wait));
         dialog.setCancelable(false);
         dialog.dismiss();
 
-        AndroidNetworking.get(Consts.API_URL + "show/products.php")
+        AndroidNetworking.get(url)
                 .setPriority(Priority.HIGH)
                 .build()
                 .getAsJSONArray(new JSONArrayRequestListener() {
@@ -85,7 +104,8 @@ public class ProductsActivity extends AppCompatActivity {
                                 products.add(Product.fromJson(response.getJSONObject(i)));
                             }
 
-                            recyclerView.setAdapter(new ProductsAdapter(ProductsActivity.this, products));
+                            recyclerView.setAdapter(adapter);
+                            adapter.notifyDataSetChanged();
 
                         } catch (JSONException e) {
                             e.printStackTrace();

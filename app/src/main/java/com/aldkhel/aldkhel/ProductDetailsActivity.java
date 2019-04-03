@@ -7,9 +7,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.RotateAnimation;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,6 +25,9 @@ import com.travijuu.numberpicker.library.Enums.ActionEnum;
 import com.travijuu.numberpicker.library.Interface.ValueChangedListener;
 import com.travijuu.numberpicker.library.NumberPicker;
 
+import java.text.ParseException;
+import java.util.Date;
+
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
@@ -31,6 +36,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
     private static final String TAG = "ProductDetailsActivity";
 
     private DbHelper dbHelper;
+    private boolean available = true;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -66,6 +72,22 @@ public class ProductDetailsActivity extends AppCompatActivity {
         tvAvailable.setAnimation(rotate);
 
         final Product product = getIntent().getParcelableExtra("product");
+
+        try {
+            available = product.getDateAvailable().before(new Date());
+            Log.wtf(TAG, available + " True");
+            if (!available) {
+                tvAvailable.setVisibility(View.VISIBLE);
+            } else {
+                tvAvailable.setVisibility(View.GONE);
+            }
+        } catch (ParseException e) {
+            available = false;
+            tvAvailable.setVisibility(View.VISIBLE);
+        }
+
+        WebView webView = findViewById(R.id.webView);
+        webView.loadData(product.getDetails(), "text/html", "UTF-8");
 
         tvName.setText(product.getName());
         tvPrice.setText(String.format(getString(R.string.price_format), product.getPrice()));
@@ -109,6 +131,12 @@ public class ProductDetailsActivity extends AppCompatActivity {
         bAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                if (!available) {
+                    Toast.makeText(ProductDetailsActivity.this, "هذا المنتج غير متاح حاليا", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 product.setQuantity(npQuantity.getValue());
                 dbHelper.addProduct(product);
                 Toast.makeText(ProductDetailsActivity.this, "تمت اضافة المنتج الي السلة", Toast.LENGTH_SHORT).show();

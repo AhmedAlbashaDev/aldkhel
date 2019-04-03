@@ -11,6 +11,9 @@ import com.aldkhel.aldkhel.utils.DbHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.util.Date;
+
 public class Product implements Parcelable {
 
     private long id;
@@ -21,6 +24,7 @@ public class Product implements Parcelable {
     private String details;
     private String imageUrl;
     private int viewed;
+    private String dateAvailable;
 
     public Product() {}
 
@@ -34,6 +38,7 @@ public class Product implements Parcelable {
         details = in.readString();
         imageUrl = in.readString();
         viewed = in.readInt();
+        dateAvailable = in.readString();
     }
 
     @Override
@@ -46,6 +51,7 @@ public class Product implements Parcelable {
         dest.writeString(details);
         dest.writeString(imageUrl);
         dest.writeInt(viewed);
+        dest.writeString(dateAvailable);
     }
 
     @Override
@@ -129,6 +135,14 @@ public class Product implements Parcelable {
         this.quantity = quantity;
     }
 
+    public Date getDateAvailable() throws ParseException {
+        return Consts.dateFormat.parse(dateAvailable);
+    }
+
+    public void setDateAvailable(String dateAvailable) {
+        this.dateAvailable = dateAvailable;
+    }
+
     public ContentValues toContentValues() {
 
         ContentValues cv = new ContentValues();
@@ -163,6 +177,7 @@ public class Product implements Parcelable {
         product.setImageUrl(json.getString("image"));
         product.setPrice(json.getDouble("price"));
         product.setViewed(json.getInt("viewed"));
+        product.setDateAvailable(json.getString("date_available"));
 //        product.setOffer(json.getDouble("offer"));
         return product;
     }
