@@ -13,6 +13,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.aldkhel.aldkhel.adapters.ProductsAdapter;
@@ -47,6 +48,7 @@ public class HomeActivity extends AppCompatActivity {
     private SliderLayout slider;
     private SliderLayout sliderFooter;
     private TabLayout tabLayout;
+    private ImageView imageView;
 
     private ProductsAdapter newProductsAdapter;
     private ProductsAdapter mostSoldProductsAdapter;
@@ -76,7 +78,7 @@ public class HomeActivity extends AppCompatActivity {
         findViewById(R.id.ivCart).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this, ProductDetailsActivity.class));
+                startActivity(new Intent(HomeActivity.this, CartActivity.class));
             }
         });
 
@@ -109,6 +111,8 @@ public class HomeActivity extends AppCompatActivity {
 
             }
         });
+
+        imageView = findViewById(R.id.ivImage);
 
         products = new ArrayList<>();
 

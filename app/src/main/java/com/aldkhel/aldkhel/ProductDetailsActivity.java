@@ -13,9 +13,11 @@ import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.aldkhel.aldkhel.models.Product;
 import com.aldkhel.aldkhel.utils.Consts;
+import com.aldkhel.aldkhel.utils.DbHelper;
 import com.squareup.picasso.Picasso;
 import com.travijuu.numberpicker.library.Enums.ActionEnum;
 import com.travijuu.numberpicker.library.Interface.ValueChangedListener;
@@ -27,6 +29,8 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 public class ProductDetailsActivity extends AppCompatActivity {
 
     private static final String TAG = "ProductDetailsActivity";
+
+    private DbHelper dbHelper;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -42,6 +46,8 @@ public class ProductDetailsActivity extends AppCompatActivity {
                 .build()
         );
         setContentView(R.layout.activity_product_details);
+
+        dbHelper = new DbHelper(this);
 
         final TextView tvName = findViewById(R.id.tvName);
         final ImageView ivImage = findViewById(R.id.ivImage);
@@ -104,6 +110,9 @@ public class ProductDetailsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 product.setQuantity(npQuantity.getValue());
+                dbHelper.addProduct(product);
+                Toast.makeText(ProductDetailsActivity.this, "تمت اضافة المنتج الي السلة", Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
     }

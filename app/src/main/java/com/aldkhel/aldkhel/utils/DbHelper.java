@@ -62,7 +62,19 @@ public class DbHelper  extends SQLiteOpenHelper {
                 null);
 
         if (cursor != null && cursor.getCount() > 0) {
-            return 1;
+            // update product quantity
+            cursor.moveToFirst();
+            int quantity = cursor.getInt(cursor.getColumnIndex(ProductContract.COL_QUANTITY));
+            product.setQuantity(product.getQuantity() + quantity);
+
+            cursor.close();
+
+            return getWritableDatabase().update(
+                    ProductContract.TABLE_PRODUCTS,
+                    product.toContentValues(),
+                    ProductContract.COL_ID + " = ?",
+                    new String[] {product.getId() + ""}
+            );
         }
 
         // insert new value
