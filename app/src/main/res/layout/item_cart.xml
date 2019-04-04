@@ -1,63 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="8dp"
     android:layout_marginBottom="8dp">
 
+
     <LinearLayout
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/tvName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:gravity="right"
-            android:textAlignment="gravity"
-            android:textColor="@android:color/black"
-            android:text="المنتج"/>
-
         <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
+            android:padding="5dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_width="0dip"
             android:layout_height="wrap_content">
-            <ImageView
-                android:id="@+id/ivDelete"
-                android:padding="8dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_delete_red_600_24dp"/>
 
-            <TextView
-                android:padding="8dp"
-                android:layout_weight=".3"
-                android:id="@+id/tvQuantity"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:gravity="right"
-                android:textAlignment="gravity"
-                android:textColor="@android:color/black"
-                android:text="50"/>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <TextView
-                android:padding="8dp"
-                android:layout_weight=".3"
-                android:id="@+id/tvPrice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textStyle="bold"
-                android:gravity="right"
-                android:textAlignment="gravity"
-                android:textColor="@android:color/black"
-                android:text="500 Riyal"/>
+
+                <TextView
+                    android:layout_gravity="right"
+                    android:id="@+id/tvName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:gravity="right"
+                    android:textAlignment="gravity"
+                    android:textColor="@android:color/black"
+                    android:text="المنتج"/>
+
+                <ImageView
+                    android:layout_gravity="left"
+                    android:id="@+id/ivDelete"
+                    android:padding="8dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_delete_red_600_24dp"/>
+
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.travijuu.numberpicker.library.NumberPicker
+                    android:layout_marginTop="5dp"
+                    android:layout_gravity="left"
+                    android:id="@+id/npQuantity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    app:min="1"
+                    app:max="100"
+                    app:value="1"
+                    app:unit="1"
+                    app:focusable="false" />
+
+                <TextView
+                    android:layout_gravity="right"
+                    android:padding="8dp"
+                    android:id="@+id/tvPrice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:gravity="right"
+                    android:textAlignment="gravity"
+                    android:textColor="@android:color/black"
+                    android:text="500 Riyal"/>
+
+            </FrameLayout>
 
         </LinearLayout>
 
+        <ImageView
+            android:id="@+id/ivImage"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/logo"/>
+
     </LinearLayout>
+
+
+
 
 </android.support.v7.widget.CardView>

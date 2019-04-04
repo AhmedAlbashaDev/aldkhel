@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -187,7 +188,30 @@ public class HomeActivity extends AppCompatActivity {
         sliderFooter.setCustomAnimation(new DescriptionAnimation());
         sliderFooter.setDuration(8000);
 
-        sliderFooter.addSlider(textSliderView);
+        int[] images = {R.drawable.s1, R.drawable.s2, R.drawable.s3};
+
+        for (int image : images) {
+            TextSliderView tsv = new TextSliderView(HomeActivity.this);
+            textSliderView
+                    .description("")
+                    .image(image)
+                    .setScaleType(BaseSliderView.ScaleType.Fit);
+            sliderFooter.addSlider(tsv);
+        }
+
+        final SearchView searchView = findViewById(R.id.searchView);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                filterProducts(s);
+                return true;
+            }
+        });
 
         getCategories();
         getBanners();
@@ -370,6 +394,33 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
+    private void filterProducts(String search) {
+
+        if (search.length() == 0) {
+            recyclerView.setAdapter(mostSoldProductsAdapter);
+            recyclerViewFooter.setAdapter(newProductsAdapter);
+            return;
+        }
+
+        List<Product> products1 = new ArrayList<>();
+        List<Product> products2 = new ArrayList<>();
+
+        for (Product product : products) {
+            if (product.getName().contains(search)) {
+                products1.add(product);
+            }
+        }
+
+        for (Product product : productsExtra) {
+            if (product.getName().contains(search)) {
+                products2.add(product);
+            }
+        }
+
+        recyclerView.setAdapter(new ProductsAdapter(this, products1));
+        recyclerViewFooter.setAdapter(new ProductsAdapter(this, products2));
+
+    }
 
     @Override
     public void onBackPressed() {

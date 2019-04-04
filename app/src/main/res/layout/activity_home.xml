@@ -119,13 +119,14 @@
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:scaleType="fitXY"
-            android:src="@drawable/logo"/>
+            android:src="@drawable/static_img"/>
 
         <com.daimajia.slider.library.SliderLayout
             android:layout_marginTop="20dp"
             android:id="@+id/sliderFooter"
             android:layout_width="match_parent"
-            android:layout_height="50dp"/>
+            android:layout_height="50dp"
+            app:indicator_visibility="invisible"/>
 
         <FrameLayout
             android:layout_width="match_parent"

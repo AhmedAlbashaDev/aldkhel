@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aldkhel.aldkhel.adapters.ProductsAdapter;
 import com.aldkhel.aldkhel.models.Product;
 import com.aldkhel.aldkhel.utils.Consts;
 import com.aldkhel.aldkhel.utils.DbHelper;
@@ -26,7 +27,9 @@ import com.travijuu.numberpicker.library.Interface.ValueChangedListener;
 import com.travijuu.numberpicker.library.NumberPicker;
 
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -118,7 +121,13 @@ public class ProductDetailsActivity extends AppCompatActivity {
 //        tvType.setText(String.format(getString(R.string.for)));
         RecyclerView recyclerView = findViewById(R.id.recycle);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        List<Product> products = new ArrayList<>();
+        for (int i=0;i<6;i++) {
+            products.add(product);
+        }
+
+        recyclerView.setAdapter(new ProductsAdapter(this, products));
 
         npQuantity.setValueChangedListener(new ValueChangedListener() {
             @Override

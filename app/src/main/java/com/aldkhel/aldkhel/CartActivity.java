@@ -26,6 +26,8 @@ import android.widget.Toast;
 import com.aldkhel.aldkhel.models.Product;
 import com.aldkhel.aldkhel.utils.Consts;
 import com.aldkhel.aldkhel.utils.DbHelper;
+import com.squareup.picasso.Picasso;
+import com.travijuu.numberpicker.library.NumberPicker;
 
 import org.json.JSONArray;
 
@@ -168,8 +170,14 @@ public class CartActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull final VH holder, int position) {
             final Product product = products.get(position);
+
+            Picasso.with(CartActivity.this)
+                    .load(product.getImageUrl().replaceFirst("http://fahdaldobian.com/store_org/image/", ""))
+                    .into(holder.ivImage);
+
+            Log.wtf(TAG, product.getImageUrl().replaceFirst("http://fahdaldobian.com/store_org/image/", "") + " IMG");
             holder.tvName.setText(product.getName());
-            holder.tvQuantity.setText(String.format(getString(R.string.cart_quantity), product.getQuantity()));
+            holder.npQuantity.setValue(product.getQuantity());
             double price = product.getOffer() > 0 ? product.getOffer() : product.getPrice();
             holder.tvPrice.setText(String.format(getString(R.string.cart_price_format),
                     price));
@@ -213,15 +221,17 @@ public class CartActivity extends AppCompatActivity {
         class VH extends RecyclerView.ViewHolder {
             private TextView tvName;
             private TextView tvPrice;
-            private TextView tvQuantity;
+            private NumberPicker npQuantity;
             private ImageView ivDelete;
+            private ImageView ivImage;
 
             VH(View v) {
                 super(v);
                 tvName = v.findViewById(R.id.tvName);
                 tvPrice = v.findViewById(R.id.tvPrice);
-                tvQuantity = v.findViewById(R.id.tvQuantity);
+                npQuantity = v.findViewById(R.id.npQuantity);
                 ivDelete = v.findViewById(R.id.ivDelete);
+                ivImage = v.findViewById(R.id.ivImage);
             }
         }
 
