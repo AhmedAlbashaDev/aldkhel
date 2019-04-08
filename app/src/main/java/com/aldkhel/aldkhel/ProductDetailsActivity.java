@@ -1,6 +1,7 @@
 package com.aldkhel.aldkhel;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -18,13 +19,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aldkhel.aldkhel.adapters.ProductsAdapter;
+import com.aldkhel.aldkhel.models.Category;
 import com.aldkhel.aldkhel.models.Product;
 import com.aldkhel.aldkhel.utils.Consts;
 import com.aldkhel.aldkhel.utils.DbHelper;
+import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.Priority;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONArrayRequestListener;
 import com.squareup.picasso.Picasso;
 import com.travijuu.numberpicker.library.Enums.ActionEnum;
 import com.travijuu.numberpicker.library.Interface.ValueChangedListener;
 import com.travijuu.numberpicker.library.NumberPicker;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -38,6 +47,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
     private static final String TAG = "ProductDetailsActivity";
 
+    private RecyclerView recyclerView;
     private DbHelper dbHelper;
     private boolean available = true;
 
@@ -74,7 +84,9 @@ public class ProductDetailsActivity extends AppCompatActivity {
         RotateAnimation rotate = (RotateAnimation) AnimationUtils.loadAnimation(this, R.anim.rotate_animation);
         tvAvailable.setAnimation(rotate);
 
-        final Product product = getIntent().getParcelableExtra("product");
+        Intent intent = getIntent();
+
+        final Product product = intent.getParcelableExtra("product");
 
         try {
             available = product.getDateAvailable().before(new Date());
@@ -119,15 +131,11 @@ public class ProductDetailsActivity extends AppCompatActivity {
         }
 
 //        tvType.setText(String.format(getString(R.string.for)));
-        RecyclerView recyclerView = findViewById(R.id.recycle);
+        recyclerView = findViewById(R.id.recycle);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        List<Product> products = new ArrayList<>();
-        for (int i=0;i<6;i++) {
-            products.add(product);
-        }
 
-        recyclerView.setAdapter(new ProductsAdapter(this, products));
+        getOtherProducts();
 
         npQuantity.setValueChangedListener(new ValueChangedListener() {
             @Override
@@ -152,6 +160,42 @@ public class ProductDetailsActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    private void getOtherProducts() {
+
+        final List<Product> products = new ArrayList<>();
+
+        Category category = getIntent().getParcelableExtra("category");
+
+        AndroidNetworking.get(Consts.API_URL + "show/products_new.php?category_id=" + category.getId())
+                .setPriority(Priority.HIGH)
+                .build()
+                .getAsJSONArray(new JSONArrayRequestListener() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d(TAG, response.toString());
+
+                        try {
+
+                            for (int i=0;i<response.length();i++) {
+                                products.add(Product.fromJson(response.getJSONObject(i)));
+                            }
+
+                            recyclerView.setAdapter(new ProductsAdapter(ProductDetailsActivity.this, products));
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        error.printStackTrace();
+                        Toast.makeText(ProductDetailsActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
     }
 
 }

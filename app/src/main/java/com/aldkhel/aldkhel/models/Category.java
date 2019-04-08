@@ -11,7 +11,7 @@ public class Category implements Parcelable {
     private long id;
     private String name;
 
-    private Category() {}
+    public Category() {}
 
     private Category(Parcel in) {
         id = in.readLong();

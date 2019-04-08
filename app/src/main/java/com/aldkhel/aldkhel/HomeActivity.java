@@ -147,6 +147,7 @@ public class HomeActivity extends AppCompatActivity {
             public void onProductSelected(int position) {
                 Intent intent = new Intent(HomeActivity.this, ProductDetailsActivity.class);
                 intent.putExtra("product", products.get(position));
+                intent.putExtra("category", category);
                 startActivity(intent);
             }
         });

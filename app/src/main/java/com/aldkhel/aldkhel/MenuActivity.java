@@ -1,6 +1,5 @@
 package com.aldkhel.aldkhel;
 
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -16,6 +15,7 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aldkhel.aldkhel.models.Category;
 import com.aldkhel.aldkhel.utils.Consts;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
@@ -23,6 +23,7 @@ import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONArrayRequestListener;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,6 +40,9 @@ public class MenuActivity extends AppCompatActivity {
     private ExpandableListAdapter expandableListAdapter;
     private List<String> expandableListTitle;
     private HashMap<String, List<String>> expandableListDetail;
+
+    private List<Long> expandableListParentIds;
+    private HashMap<Long, List<Long>> expandableListDetailIds;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -57,28 +61,45 @@ public class MenuActivity extends AppCompatActivity {
 
         expandableListView = findViewById(R.id.expandableListView);
 
-        expandableListDetail = loadFakeData();
-        expandableListTitle = new ArrayList<>(expandableListDetail.keySet());
+//        expandableListDetail = loadFakeData();
+//        expandableListTitle = new ArrayList<>(expandableListDetail.keySet());
 
 
-        expandableListAdapter = new CustomExpandableListAdapter(this, expandableListTitle, expandableListDetail);
-        expandableListView.setAdapter(expandableListAdapter);
 
         expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
             @Override
             public boolean onChildClick(ExpandableListView parent, View v,
                                         int groupPosition, int childPosition, long id) {
-                Toast.makeText(
-                        getApplicationContext(),
-                        expandableListTitle.get(groupPosition)
-                                + " -> "
-                                + expandableListDetail.get(
-                                expandableListTitle.get(groupPosition)).get(
-                                childPosition), Toast.LENGTH_SHORT
-                ).show();
-                return false;
+
+                Category category = new Category();
+                category.setId(expandableListDetailIds.get(groupPosition).get(childPosition));
+                category.setName(expandableListDetail.get(groupPosition).get(childPosition));
+
+                Intent i = new Intent(MenuActivity.this, ProductsActivity.class);
+                i.putExtra("url", Consts.API_URL + "show/products_new.php?category_id=" + category.getId());
+                i.putExtra("category", category);
+                startActivity(i);
+
+                return true;
             }
         });
+
+//        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+//            @Override
+//            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+//                Category category = new Category();
+//                category.setId(expandableListParentIds.get(groupPosition));
+//                category.setName(expandableListTitle.get(groupPosition));
+//
+//                Intent i = new Intent(MenuActivity.this, ProductsActivity.class);
+//                i.putExtra("url", Consts.API_URL + "show/products_new.php?category_id=" + category.getId());
+//                i.putExtra("category", category);
+//                startActivity(i);
+//                return true;
+//            }
+//        });
+
+        getCategories();
 
     }
 
@@ -97,6 +118,56 @@ public class MenuActivity extends AppCompatActivity {
         if (viewId == R.id.bCart) {
             startActivity(new Intent(this, CartActivity.class));
         }
+
+    }
+
+    private void getCategories() {
+
+        expandableListDetail = new HashMap<>();
+        expandableListDetailIds = new HashMap<>();
+
+        AndroidNetworking.get(Consts.API_URL + "show/subcates.php")
+                .setPriority(Priority.HIGH)
+                .build()
+                .getAsJSONArray(new JSONArrayRequestListener() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d(TAG, response.toString());
+
+                        try {
+
+                            for (int i=0;i<response.length();i++) {
+                                List<String> names = new ArrayList<>();
+                                List<Long> ids = new ArrayList<>();
+
+                                JSONObject json = response.getJSONObject(i);
+                                JSONArray subcategory = json.getJSONArray("subcategoryone");
+                                for (int j=0;j<subcategory.length();j++) {
+                                    JSONObject temp = subcategory.getJSONObject(j);
+                                    names.add(temp.getString("name"));
+                                    ids.add(temp.getLong("category_id"));
+                                }
+                                expandableListDetail.put(json.getString("name"), names);
+                                expandableListDetailIds.put(json.getLong("category_id"), ids);
+                            }
+
+                            expandableListTitle = new ArrayList<>(expandableListDetail.keySet());
+                            expandableListAdapter = new CustomExpandableListAdapter(MenuActivity.this, expandableListTitle, expandableListDetail);
+                            expandableListView.setAdapter(expandableListAdapter);
+
+                            expandableListParentIds = new ArrayList<>(expandableListDetailIds.keySet());
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        error.printStackTrace();
+                        Toast.makeText(MenuActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                    }
+                });
 
     }
 
@@ -126,42 +197,6 @@ public class MenuActivity extends AppCompatActivity {
         return expandableListDetail;
 
     }
-
-    private void getCategories() {
-
-        final ProgressDialog dialog = new ProgressDialog(this);
-        dialog.setMessage(getString(R.string.please_wait));
-        dialog.setCancelable(false);
-        dialog.dismiss();
-
-        AndroidNetworking.get(Consts.API_URL + "show/categories.php")
-                .setPriority(Priority.HIGH)
-                .build()
-                .getAsJSONArray(new JSONArrayRequestListener() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        dialog.dismiss();
-                        Log.d(TAG, response.toString());
-
-                        try {
-
-
-
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-                    @Override
-                    public void onError(ANError error) {
-                        dialog.dismiss();
-                        error.printStackTrace();
-                        Toast.makeText(MenuActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-    }
-
 
     class CustomExpandableListAdapter extends BaseExpandableListAdapter {
 
