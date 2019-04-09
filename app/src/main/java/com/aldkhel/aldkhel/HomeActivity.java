@@ -158,6 +158,8 @@ public class HomeActivity extends AppCompatActivity {
         recyclerViewFooter.setHasFixedSize(true);
         recyclerViewFooter.setLayoutManager(new GridLayoutManager(this, 2));
         recyclerViewFooter.addItemDecoration(new SpacesItemDecoration(3));
+//        recyclerViewFooter.stopScroll();
+        recyclerView.setNestedScrollingEnabled(false);
 
         newProductsAdapter = new ProductsAdapter(this, productsExtra);
         newProductsAdapter.setCallback(new ProductsAdapter.ProductCallback() {
@@ -165,6 +167,7 @@ public class HomeActivity extends AppCompatActivity {
             public void onProductSelected(int position) {
                 Intent intent = new Intent(HomeActivity.this, ProductDetailsActivity.class);
                 intent.putExtra("product", productsExtra.get(position));
+                intent.putExtra("category", category);
                 startActivity(intent);
             }
         });

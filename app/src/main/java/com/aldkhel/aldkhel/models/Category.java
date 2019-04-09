@@ -3,6 +3,8 @@ package com.aldkhel.aldkhel.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.aldkhel.aldkhel.utils.Consts;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -10,18 +12,21 @@ public class Category implements Parcelable {
 
     private long id;
     private String name;
+    private String image;
 
     public Category() {}
 
     private Category(Parcel in) {
         id = in.readLong();
         name = in.readString();
+        image = in.readString();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeLong(id);
         dest.writeString(name);
+        dest.writeString(image);
     }
 
     @Override
@@ -57,6 +62,14 @@ public class Category implements Parcelable {
         this.name = name;
     }
 
+    public String getImage() {
+        return Consts.BASE_IMAGE + image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
     @Override
     public String toString() {
         return name;
@@ -66,6 +79,7 @@ public class Category implements Parcelable {
         Category category = new Category();
         category.setId(json.getLong("category_id"));
         category.setName(json.getString("name"));
+        category.setImage(json.getString("image"));
         return category;
     }
 

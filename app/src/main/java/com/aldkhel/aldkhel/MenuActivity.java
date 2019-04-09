@@ -15,7 +15,6 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.aldkhel.aldkhel.models.Category;
 import com.aldkhel.aldkhel.utils.Consts;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
@@ -44,6 +43,7 @@ public class MenuActivity extends AppCompatActivity {
     private List<Long> expandableListParentIds;
     private HashMap<Long, List<Long>> expandableListDetailIds;
 
+
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(base));
@@ -66,35 +66,80 @@ public class MenuActivity extends AppCompatActivity {
 
 
 
-        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v,
-                                        int groupPosition, int childPosition, long id) {
-
-                Category category = new Category();
-                category.setId(expandableListDetailIds.get(groupPosition).get(childPosition));
-                category.setName(expandableListDetail.get(groupPosition).get(childPosition));
-
-                Intent i = new Intent(MenuActivity.this, ProductsActivity.class);
-                i.putExtra("url", Consts.API_URL + "show/products_new.php?category_id=" + category.getId());
-                i.putExtra("category", category);
-                startActivity(i);
-
-                return true;
-            }
-        });
+//        expandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
+//            @Override
+//            public boolean onChildClick(ExpandableListView parent, View v,
+//                                        int groupPosition, int childPosition, long id) {
+//
+//                Category category = new Category();
+//                category.setId(expandableListDetailIds.get(groupPosition).get(childPosition));
+//                category.setName(expandableListDetail.get(groupPosition).get(childPosition));
+//
+//
+//
+//                if (expandableListDetail.get(groupPosition).size() == 0) {
+//                    Intent i = new Intent(MenuActivity.this, ProductsActivity.class);
+//                    i.putExtra("url", Consts.API_URL + "show/products_new.php?category_id=" + category.getId());
+//                    i.putExtra("category", category);
+//                    startActivity(i);
+//                } else {
+//
+//                    List<Category> categories = new ArrayList<>();
+//
+//                    for (int i=0;i<expandableListDetail.get(groupPosition).size();i++) {
+//                        Category temp = new Category();
+//                        temp.setId(expandableListDetailIds.get(groupPosition).get(childPosition));
+//                        temp.setName(expandableListDetail.get(groupPosition).get(childPosition));
+//
+//                        categories.add(temp);
+//                    }
+//
+//                    Intent i = new Intent(MenuActivity.this, CategoriesActivity.class);
+//                    i.putExtra("category", category);
+//                    i.putExtra("categories", (Parcelable) categories);
+//                    startActivity(i);
+//                }
+//
+//
+//
+//                return true;
+//            }
+//        });
 
 //        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
 //            @Override
 //            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-//                Category category = new Category();
-//                category.setId(expandableListParentIds.get(groupPosition));
-//                category.setName(expandableListTitle.get(groupPosition));
 //
-//                Intent i = new Intent(MenuActivity.this, ProductsActivity.class);
-//                i.putExtra("url", Consts.API_URL + "show/products_new.php?category_id=" + category.getId());
-//                i.putExtra("category", category);
-//                startActivity(i);
+//                Category category = new Category();
+//                category.setId(1);
+//                category.setName("");
+//
+//
+//
+//                if (expandableListDetail.get(groupPosition).size() == 0) {
+//                    Intent i = new Intent(MenuActivity.this, ProductsActivity.class);
+//                    i.putExtra("url", Consts.API_URL + "show/products_new.php?category_id=" + category.getId());
+//                    i.putExtra("category", category);
+//                    startActivity(i);
+//                } else {
+//
+//                    List<Category> categories = new ArrayList<>();
+//
+//                    for (int i=0;i<expandableListDetail.get(groupPosition).size();i++) {
+//                        Category temp = new Category();
+//                        temp.setId(expandableListDetailIds.get(groupPosition).get(i));
+//                        temp.setName(expandableListDetail.get(groupPosition).get(i));
+//
+//                        categories.add(temp);
+//                    }
+//
+//                    Intent i = new Intent(MenuActivity.this, CategoriesActivity.class);
+//                    i.putExtra("category", category);
+//                    i.putExtra("categories", (Parcelable) categories);
+//                    startActivity(i);
+//                }
+//
+//
 //                return true;
 //            }
 //        });
