@@ -22,7 +22,7 @@ import java.util.List;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class CategoriesActivity extends AppCompatActivity {
+public class SubCategoriesActivity extends AppCompatActivity {
 
     private static final String TAG = "CategoriesActivity";
     private List<Category> categoryList;
@@ -41,7 +41,7 @@ public class CategoriesActivity extends AppCompatActivity {
                 .setFontAttrId(R.attr.fontPath)
                 .build()
         );
-        setContentView(R.layout.activity_categories);
+        setContentView(R.layout.activity_sub_categories);
 
         RecyclerView recyclerView = findViewById(R.id.recycle);
         recyclerView.setHasFixedSize(true);
@@ -65,7 +65,7 @@ public class CategoriesActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull final VH holder, int position) {
-            Picasso.with(CategoriesActivity.this)
+            Picasso.with(SubCategoriesActivity.this)
                     .load(categoryList.get(position).getImage())
                     .into(holder.ivImage);
 
@@ -74,7 +74,7 @@ public class CategoriesActivity extends AppCompatActivity {
             holder.v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent i = new Intent(CategoriesActivity.this, ProductsActivity.class);
+                    Intent i = new Intent(SubCategoriesActivity.this, ProductsActivity.class);
                     i.putExtra("url", Consts.API_URL + "show/products_new.php?category_id=" + category.getId());
                     i.putExtra("category", category);
                     startActivity(i);

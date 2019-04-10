@@ -8,11 +8,14 @@ import com.aldkhel.aldkhel.utils.Consts;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 public class Category implements Parcelable {
 
     private long id;
     private String name;
     private String image;
+    private ArrayList<Category> subCategories;
 
     public Category() {}
 

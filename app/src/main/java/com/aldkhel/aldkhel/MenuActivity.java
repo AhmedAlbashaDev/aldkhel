@@ -15,6 +15,7 @@ import android.widget.ExpandableListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aldkhel.aldkhel.models.Category;
 import com.aldkhel.aldkhel.utils.Consts;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
@@ -27,6 +28,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -42,6 +44,8 @@ public class MenuActivity extends AppCompatActivity {
 
     private List<Long> expandableListParentIds;
     private HashMap<Long, List<Long>> expandableListDetailIds;
+
+    private Map<String, List<Category>> categoriesMap;
 
 
     @Override
@@ -106,43 +110,36 @@ public class MenuActivity extends AppCompatActivity {
 //            }
 //        });
 
-//        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-//            @Override
-//            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-//
-//                Category category = new Category();
-//                category.setId(1);
-//                category.setName("");
-//
-//
-//
-//                if (expandableListDetail.get(groupPosition).size() == 0) {
-//                    Intent i = new Intent(MenuActivity.this, ProductsActivity.class);
-//                    i.putExtra("url", Consts.API_URL + "show/products_new.php?category_id=" + category.getId());
-//                    i.putExtra("category", category);
-//                    startActivity(i);
-//                } else {
-//
-//                    List<Category> categories = new ArrayList<>();
-//
-//                    for (int i=0;i<expandableListDetail.get(groupPosition).size();i++) {
-//                        Category temp = new Category();
-//                        temp.setId(expandableListDetailIds.get(groupPosition).get(i));
-//                        temp.setName(expandableListDetail.get(groupPosition).get(i));
-//
-//                        categories.add(temp);
-//                    }
-//
-//                    Intent i = new Intent(MenuActivity.this, CategoriesActivity.class);
-//                    i.putExtra("category", category);
-//                    i.putExtra("categories", (Parcelable) categories);
-//                    startActivity(i);
-//                }
-//
-//
-//                return true;
-//            }
-//        });
+        expandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+
+                String title = expandableListTitle.get(groupPosition);
+
+                Category category = new Category();
+                category.setId(1);
+                category.setName(title);
+
+
+
+                if (categoriesMap.get(title).size() == 0) {
+
+                    Intent i = new Intent(MenuActivity.this, ProductsActivity.class);
+                    i.putExtra("url", Consts.API_URL + "show/products_new.php?category_id=" + category.getId());
+                    i.putExtra("category", category);
+                    startActivity(i);
+
+                } else {
+                    Intent i = new Intent(MenuActivity.this, CategoriesActivity.class);
+                    i.putExtra("category", category);
+                    i.putExtra("categories", (ArrayList<Category>) categoriesMap.get(title));
+                    startActivity(i);
+                }
+
+
+                return true;
+            }
+        });
 
         getCategories();
 
@@ -171,6 +168,8 @@ public class MenuActivity extends AppCompatActivity {
         expandableListDetail = new HashMap<>();
         expandableListDetailIds = new HashMap<>();
 
+        categoriesMap = new HashMap<>();
+
         AndroidNetworking.get(Consts.API_URL + "show/subcates.php")
                 .setPriority(Priority.HIGH)
                 .build()
@@ -185,13 +184,24 @@ public class MenuActivity extends AppCompatActivity {
                                 List<String> names = new ArrayList<>();
                                 List<Long> ids = new ArrayList<>();
 
+                                List<Category> categories = new ArrayList<>();
+
                                 JSONObject json = response.getJSONObject(i);
                                 JSONArray subcategory = json.getJSONArray("subcategoryone");
+
+
+
+
                                 for (int j=0;j<subcategory.length();j++) {
                                     JSONObject temp = subcategory.getJSONObject(j);
                                     names.add(temp.getString("name"));
                                     ids.add(temp.getLong("category_id"));
+
+                                    categories.add(Category.fromJson(temp));
                                 }
+
+                                categoriesMap.put(json.getString("name"), categories);
+
                                 expandableListDetail.put(json.getString("name"), names);
                                 expandableListDetailIds.put(json.getLong("category_id"), ids);
                             }
@@ -249,8 +259,8 @@ public class MenuActivity extends AppCompatActivity {
         private List<String> expandableListTitle;
         private HashMap<String, List<String>> expandableListDetail;
 
-        public CustomExpandableListAdapter(Context context, List<String> expandableListTitle,
-                                           HashMap<String, List<String>> expandableListDetail) {
+        CustomExpandableListAdapter(Context context, List<String> expandableListTitle,
+                                    HashMap<String, List<String>> expandableListDetail) {
             this.context = context;
             this.expandableListTitle = expandableListTitle;
             this.expandableListDetail = expandableListDetail;

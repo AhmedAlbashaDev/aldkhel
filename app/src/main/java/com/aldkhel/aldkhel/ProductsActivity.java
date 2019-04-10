@@ -60,7 +60,6 @@ public class ProductsActivity extends AppCompatActivity {
         TextView tvCategory = findViewById(R.id.tvCategory);
         tvCategory.setText(category.getName());
 
-
         recyclerView = findViewById(R.id.recycle);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
