@@ -11,9 +11,13 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="false"
         android:theme="@style/AppTheme">
-        <activity android:name=".SubCategoriesActivity"
+        <activity android:name=".SearchActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".SubCategoriesActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".CategoriesActivity"
             android:screenOrientation="portrait"
