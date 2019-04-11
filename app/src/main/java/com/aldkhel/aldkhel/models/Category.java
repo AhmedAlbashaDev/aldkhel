@@ -8,14 +8,15 @@ import com.aldkhel.aldkhel.utils.Consts;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class Category implements Parcelable {
 
     private long id;
     private String name;
     private String image;
-    private ArrayList<Category> subCategories;
+    private String jsonString;
+    private List<Category> subCategories;
 
     public Category() {}
 
@@ -23,6 +24,7 @@ public class Category implements Parcelable {
         id = in.readLong();
         name = in.readString();
         image = in.readString();
+        jsonString = in.readString();
     }
 
     @Override
@@ -30,6 +32,7 @@ public class Category implements Parcelable {
         dest.writeLong(id);
         dest.writeString(name);
         dest.writeString(image);
+        dest.writeString(jsonString);
     }
 
     @Override
@@ -71,6 +74,22 @@ public class Category implements Parcelable {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public String getJsonString() {
+        return jsonString;
+    }
+
+    public void setJsonString(String jsonString) {
+        this.jsonString = jsonString;
+    }
+
+    public List<Category> getSubCategories() {
+        return subCategories;
+    }
+
+    public void setSubCategories(List<Category> subCategories) {
+        this.subCategories = subCategories;
     }
 
     @Override

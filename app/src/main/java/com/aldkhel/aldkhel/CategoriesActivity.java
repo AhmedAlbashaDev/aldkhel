@@ -17,6 +17,10 @@ import com.aldkhel.aldkhel.utils.Consts;
 import com.aldkhel.aldkhel.utils.SpacesItemDecoration;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -65,19 +69,52 @@ public class CategoriesActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull final VH holder, int position) {
+
+
+            final Category c = categoryList.get(position);
+
             Picasso.with(CategoriesActivity.this)
-                    .load(categoryList.get(position).getImage())
+                    .load(c.getImage())
                     .into(holder.ivImage);
 
-            holder.tvName.setText(categoryList.get(position).getName());
+            holder.tvName.setText(c.getName());
 
             holder.v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent i = new Intent(CategoriesActivity.this, ProductsActivity.class);
-                    i.putExtra("url", Consts.API_URL + "show/products_new.php?category_id=" + category.getId());
-                    i.putExtra("category", category);
-                    startActivity(i);
+
+                    try {
+
+                        JSONArray array = new JSONArray(c.getJsonString());
+                        if (array.length() > 0) {
+
+                            ArrayList<Category> subc = new ArrayList<>();
+
+                            for (int c=0;c<array.length();c++) {
+                                subc.add(Category.fromJson(array.getJSONObject(c)));
+                            }
+
+                            Intent i = new Intent(CategoriesActivity.this, SubCategoriesActivity.class);
+                            i.putExtra("category", c);
+                            i.putExtra("categories", subc);
+                            startActivity(i);
+
+                        } else {
+                            Intent i = new Intent(CategoriesActivity.this, ProductsActivity.class);
+                            i.putExtra("url", Consts.API_URL + "show/products_new.php?category_id=" + c.getId());
+                            i.putExtra("category", c);
+                            startActivity(i);
+                        }
+
+                    } catch (JSONException e) {
+
+                        Intent i = new Intent(CategoriesActivity.this, ProductsActivity.class);
+                        i.putExtra("url", Consts.API_URL + "show/products_new.php?category_id=" + c.getId());
+                        i.putExtra("category", c);
+                        startActivity(i);
+
+                    }
+
                 }
             });
         }

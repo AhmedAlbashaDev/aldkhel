@@ -12,7 +12,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.view.animation.RotateAnimation;
-import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -101,8 +100,8 @@ public class ProductDetailsActivity extends AppCompatActivity {
             tvAvailable.setVisibility(View.VISIBLE);
         }
 
-        WebView webView = findViewById(R.id.webView);
-        webView.loadData(product.getDetails(), "text/html", "UTF-8");
+//        WebView webView = findViewById(R.id.webView);
+//        webView.loadData(product.getDetails(), "text/html", "UTF-8");
 
         tvName.setText(product.getName());
         tvPrice.setText(String.format(getString(R.string.price_format), product.getPrice()));

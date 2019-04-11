@@ -55,7 +55,7 @@ public class ProductsActivity extends AppCompatActivity {
 
         products = new ArrayList<>();
 
-        Category category = getIntent().getParcelableExtra("category");
+        final Category category = getIntent().getParcelableExtra("category");
 
         TextView tvCategory = findViewById(R.id.tvCategory);
         tvCategory.setText(category.getName());
@@ -71,6 +71,7 @@ public class ProductsActivity extends AppCompatActivity {
             public void onProductSelected(int position) {
                 Intent intent = new Intent(ProductsActivity.this, ProductDetailsActivity.class);
                 intent.putExtra("product", products.get(position));
+                intent.putExtra("category", category);
                 startActivity(intent);
             }
         });

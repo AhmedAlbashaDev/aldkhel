@@ -136,7 +136,6 @@ public class MenuActivity extends AppCompatActivity {
                     startActivity(i);
                 }
 
-
                 return true;
             }
         });
@@ -197,7 +196,20 @@ public class MenuActivity extends AppCompatActivity {
                                     names.add(temp.getString("name"));
                                     ids.add(temp.getLong("category_id"));
 
-                                    categories.add(Category.fromJson(temp));
+
+                                    ArrayList<Category> subc = new ArrayList<>();
+
+                                    for (int c=0;c<temp.getJSONArray("subcategorytwo").length();c++) {
+                                        JSONObject cc = temp.getJSONArray("subcategorytwo").getJSONObject(c);
+                                        subc.add(Category.fromJson(cc));
+                                    }
+
+
+                                    Category category = Category.fromJson(temp);
+                                    category.setSubCategories(subc);
+                                    category.setJsonString(temp.getJSONArray("subcategorytwo").toString());
+                                    categories.add(category);
+
                                 }
 
                                 categoriesMap.put(json.getString("name"), categories);

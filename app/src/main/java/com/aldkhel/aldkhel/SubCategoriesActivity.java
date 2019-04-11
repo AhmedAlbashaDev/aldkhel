@@ -75,8 +75,8 @@ public class SubCategoriesActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     Intent i = new Intent(SubCategoriesActivity.this, ProductsActivity.class);
-                    i.putExtra("url", Consts.API_URL + "show/products_new.php?category_id=" + category.getId());
-                    i.putExtra("category", category);
+                    i.putExtra("url", Consts.API_URL + "show/products_new.php?category_id=" + categoryList.get(holder.getAdapterPosition()).getId());
+                    i.putExtra("category", categoryList.get(holder.getAdapterPosition()));
                     startActivity(i);
                 }
             });
