@@ -207,13 +207,18 @@ public class HomeActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
-                return false;
+                Intent i = new Intent(HomeActivity.this, SearchActivity.class);
+                i.putExtra("search", s);
+                i.putExtra("products", (ArrayList<Product>) products);
+                i.putExtra("category", category);
+                startActivity(i);
+                return true;
             }
 
             @Override
             public boolean onQueryTextChange(String s) {
-                filterProducts(s);
-                return true;
+//                filterProducts(s);
+                return false;
             }
         });
 

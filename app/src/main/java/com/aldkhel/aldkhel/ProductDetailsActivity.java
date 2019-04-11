@@ -165,7 +165,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
         final List<Product> products = new ArrayList<>();
 
-        Category category = getIntent().getParcelableExtra("category");
+        final Category category = getIntent().getParcelableExtra("category");
 
         AndroidNetworking.get(Consts.API_URL + "show/products_new.php?category_id=" + category.getId())
                 .setPriority(Priority.HIGH)
@@ -181,7 +181,17 @@ public class ProductDetailsActivity extends AppCompatActivity {
                                 products.add(Product.fromJson(response.getJSONObject(i)));
                             }
 
-                            recyclerView.setAdapter(new ProductsAdapter(ProductDetailsActivity.this, products));
+                            ProductsAdapter adapter = new ProductsAdapter(ProductDetailsActivity.this, products);
+                            adapter.setCallback(new ProductsAdapter.ProductCallback() {
+                                @Override
+                                public void onProductSelected(int position) {
+                                    Intent intent = new Intent(ProductDetailsActivity.this, ProductDetailsActivity.class);
+                                    intent.putExtra("product", products.get(position));
+                                    intent.putExtra("category", category);
+                                    startActivity(intent);
+                                }
+                            });
+                            recyclerView.setAdapter(adapter);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
