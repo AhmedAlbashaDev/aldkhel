@@ -80,6 +80,6 @@
         android:textSize="16sp"
         android:gravity="center"
         android:padding="8dp"
-        android:text="ليس لديك حساب !؟ تسجيل حساب جديد"/>
+        android:text="ليس لديك حساب! تسجيل حساب جديد"/>
 
 </LinearLayout>

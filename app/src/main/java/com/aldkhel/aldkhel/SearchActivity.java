@@ -68,9 +68,11 @@ public class SearchActivity extends AppCompatActivity {
 
         category = getIntent().getParcelableExtra("category");
 
-        category.setName("");
+//        category.setName("");
 
         adapter = new ProductsAdapter(this, products);
+        recyclerView.setAdapter(adapter);
+
         adapter.setCallback(new ProductsAdapter.ProductCallback() {
             @Override
             public void onProductSelected(int position) {
@@ -123,7 +125,7 @@ public class SearchActivity extends AppCompatActivity {
                                 products.add(Product.fromJson(response.getJSONObject(i)));
                             }
 
-
+                            adapter.notifyDataSetChanged();
 
                         } catch (JSONException e) {
                             e.printStackTrace();

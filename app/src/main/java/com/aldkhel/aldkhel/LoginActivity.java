@@ -52,7 +52,7 @@ public class LoginActivity extends AppCompatActivity {
                 AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                 builder.setView(view);
                 builder.setTitle("هل نسيت كلمة المرور ؟");
-                builder.setPositiveButton("", new DialogInterface.OnClickListener() {
+                builder.setPositiveButton("متابعة", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
