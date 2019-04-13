@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:orientation="vertical" android:padding="10dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ادخل البريد الاكتروني المرتبط مع حسابك. انقر علي متابعة ليتم ارسال رابط انشاء كلمة مرور جديدة الى بريدك الخاص"
+        android:gravity="center"
+        android:textSize="16sp"/>
+
+    <EditText
+        android:layout_marginTop="10dp"
+        android:id="@+id/etEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textEmailAddress"
+        android:background="#efefef"
+        android:padding="10dp"
+        android:hint="البريد الاكتروني"/>
+
+</LinearLayout>

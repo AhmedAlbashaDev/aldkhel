@@ -156,6 +156,10 @@ public class MenuActivity extends AppCompatActivity {
 
         }
 
+        if (viewId == R.id.bLogin) {
+            startActivity(new Intent(this, LoginActivity.class));
+        }
+
         if (viewId == R.id.bCart) {
             startActivity(new Intent(this, CartActivity.class));
         }

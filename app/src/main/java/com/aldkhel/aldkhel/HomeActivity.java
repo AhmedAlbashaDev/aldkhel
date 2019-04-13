@@ -209,7 +209,6 @@ public class HomeActivity extends AppCompatActivity {
             public boolean onQueryTextSubmit(String s) {
                 Intent i = new Intent(HomeActivity.this, SearchActivity.class);
                 i.putExtra("search", s);
-                i.putExtra("products", (ArrayList<Product>) products);
                 i.putExtra("category", category);
                 startActivity(i);
                 return true;

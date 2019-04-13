@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:textColor="@color/colorAccent"
+            android:src="@drawable/logo"/>
+
+        <View
+            android:layout_margin="10dp"
+            android:layout_gravity="bottom"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/colorAccent"/>
+
+    </FrameLayout>
+
+    <EditText
+        android:layout_margin="10dp"
+        android:id="@+id/etEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#efefef"
+        android:padding="10dp"
+        android:inputType="textEmailAddress"
+        android:hint="البريد الاكتروني"/>
+
+    <EditText
+        android:layout_margin="10dp"
+        android:id="@+id/etPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#efefef"
+        android:padding="10dp"
+        android:inputType="textPassword"
+        android:gravity="right"
+        android:hint="كلمة المرور"/>
+
+    <Button
+        android:layout_margin="10dp"
+        android:id="@+id/bLogin"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:background="@drawable/button_style"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        android:text="تسجيل الدخول"/>
+
+    <TextView
+        android:id="@+id/tvForgetPassword"
+        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textColor="@color/colorPrimary"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="نسيت كلمة المرور"/>
+
+
+    <TextView
+        android:id="@+id/bRegister"
+        android:layout_marginTop="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="ليس لديك حساب !؟ تسجيل حساب جديد"/>
+
+</LinearLayout>

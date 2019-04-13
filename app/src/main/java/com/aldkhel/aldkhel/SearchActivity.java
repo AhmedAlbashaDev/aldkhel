@@ -8,14 +8,24 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.aldkhel.aldkhel.adapters.ProductsAdapter;
 import com.aldkhel.aldkhel.models.Category;
 import com.aldkhel.aldkhel.models.Product;
 import com.aldkhel.aldkhel.utils.Consts;
 import com.aldkhel.aldkhel.utils.SpacesItemDecoration;
+import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.Priority;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONArrayRequestListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,6 +57,8 @@ public class SearchActivity extends AppCompatActivity {
         );
         setContentView(R.layout.activity_search);
 
+        products = new ArrayList<>();
+
         recyclerView = findViewById(R.id.recycle);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
@@ -54,8 +66,9 @@ public class SearchActivity extends AppCompatActivity {
 //        recyclerView.stopScroll();
         recyclerView.setNestedScrollingEnabled(false);
 
-        products = getIntent().getParcelableArrayListExtra("products");
         category = getIntent().getParcelableExtra("category");
+
+        category.setName("");
 
         adapter = new ProductsAdapter(this, products);
         adapter.setCallback(new ProductsAdapter.ProductCallback() {
@@ -71,7 +84,9 @@ public class SearchActivity extends AppCompatActivity {
 
         final EditText etSearch = findViewById(R.id.etSearch);
         etSearch.setText(getIntent().getStringExtra("search"));
-        filterProducts(getIntent().getStringExtra("search"));
+
+        doSearch(getIntent().getStringExtra("search"));
+
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -80,7 +95,7 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterProducts(s.toString());
+                doSearch(s.toString());
             }
 
             @Override
@@ -91,21 +106,36 @@ public class SearchActivity extends AppCompatActivity {
 
     }
 
-    private void filterProducts(String search) {
+    private void doSearch(String search) {
 
-        if (search.length() == 0) {
-            recyclerView.setAdapter(adapter);
-            return;
-        }
 
-        List<Product> products1 = new ArrayList<>();
+        AndroidNetworking.get(Consts.API_URL + "show/search_products.php?search=" + URLEncoder.encode(search))
+                .setPriority(Priority.HIGH)
+                .build()
+                .getAsJSONArray(new JSONArrayRequestListener() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.d(TAG, response.toString());
 
-        for (Product product : products) {
-            if (product.getName().contains(search)) {
-                products1.add(product);
-            }
-        }
-        recyclerView.setAdapter(new ProductsAdapter(this, products1));
+                        try {
+
+                            for (int i=0;i<response.length();i++) {
+                                products.add(Product.fromJson(response.getJSONObject(i)));
+                            }
+
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        error.printStackTrace();
+                        Toast.makeText(SearchActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                    }
+                });
 
     }
 
