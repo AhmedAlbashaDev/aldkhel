@@ -42,7 +42,6 @@ public class LoginActivity extends AppCompatActivity {
         );
         setContentView(R.layout.activity_login);
 
-
         findViewById(R.id.tvForgetPassword).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -107,7 +106,7 @@ public class LoginActivity extends AppCompatActivity {
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setMessage(getString(R.string.please_wait));
         dialog.setCancelable(false);
-        dialog.dismiss();
+        dialog.show();
 
         AndroidNetworking.post(Consts.API_URL + "write/login.php")
                 .setPriority(Priority.HIGH)
@@ -140,7 +139,7 @@ public class LoginActivity extends AppCompatActivity {
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setMessage(getString(R.string.please_wait));
         dialog.setCancelable(false);
-        dialog.dismiss();
+        dialog.show();
 
         AndroidNetworking.post(Consts.API_URL + "write/forget_password.php")
                 .setPriority(Priority.HIGH)

@@ -222,7 +222,7 @@
             android:layout_marginRight="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"/>
+            android:padding="8dp"/>
 
         <TextView
             android:layout_marginTop="5dp"
@@ -233,13 +233,13 @@
             android:text="المنطقة او المحافظة"/>
 
         <Spinner
-            android:id="@+id/spCity"
+            android:id="@+id/spZone"
             android:background="#efefef"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"/>
+            android:padding="8dp"/>
 
         <android.support.design.widget.TextInputLayout
             android:layout_marginTop="5dp"

@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -17,8 +18,14 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONArrayRequestListener;
+import com.androidnetworking.interfaces.StringRequestListener;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -26,6 +33,12 @@ import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 public class RegisterActivity extends AppCompatActivity {
 
     private static final String TAG = "RegisterActivity";
+
+    private Spinner spCountry;
+    private Spinner spZone;
+
+    private Map<String, Integer> countries;
+    private Map<String, Integer> zones;
 
     private String fname;
     private String sname;
@@ -37,7 +50,8 @@ public class RegisterActivity extends AppCompatActivity {
     private String mail;
     private String password;
     private String confPassword;
-    private String country;
+    private int countryId;
+    private int zoneId;
     private String city;
     private int news;
 
@@ -68,13 +82,14 @@ public class RegisterActivity extends AppCompatActivity {
         final EditText etPhone = findViewById(R.id.etPhone);
         final EditText etEmail = findViewById(R.id.etEmail);
         final EditText etCompany = findViewById(R.id.etCompany);
+        final EditText etCity = findViewById(R.id.etCity);
         final EditText etAddress = findViewById(R.id.etAddress);
         final EditText etAddress2 = findViewById(R.id.etAddress2);
         final EditText etMail = findViewById(R.id.etMail);
         final EditText etPassword = findViewById(R.id.etPassword);
         final EditText etConfPassword = findViewById(R.id.etConfPassword);
-        final Spinner spCountry = findViewById(R.id.spCountry);
-        final Spinner spCity = findViewById(R.id.spCity);
+        spCountry = findViewById(R.id.spCountry);
+        spZone = findViewById(R.id.spZone);
         final AppCompatCheckBox cbNews = findViewById(R.id.cbNews);
         final AppCompatCheckBox cbAgree = findViewById(R.id.cbAgree);
 
@@ -91,13 +106,20 @@ public class RegisterActivity extends AppCompatActivity {
                 address = etAddress.getText().toString();
                 address2 = etAddress2.getText().toString();
                 mail = etMail.getText().toString();
-                city = spCity.getSelectedItem().toString();
-                country = spCountry.getSelectedItem().toString();
+                city = etCity.getText().toString();
                 password = etPassword.getText().toString();
                 confPassword = etConfPassword.getText().toString();
 
+                countryId = countries.get(spCountry.getSelectedItem().toString());
+                zoneId = zones.get(spZone.getSelectedItem().toString());
+
                 if (!password.equals(confPassword)) {
                     Toast.makeText(RegisterActivity.this, "كلمة المرور غير متطابقة", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (!cbAgree.isChecked()) {
+                    Toast.makeText(RegisterActivity.this, "الرجاء الموافقة على الشروط والاحكام", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -105,18 +127,64 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
+
+        fetchCountries();
+        fetchZones();
+
     }
 
     private void doRegister() {
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setMessage(getString(R.string.please_wait));
         dialog.setCancelable(false);
-        dialog.dismiss();
+        dialog.show();
 
-        AndroidNetworking.post(Consts.API_URL + "write/login.php")
+        AndroidNetworking.post("http://www.fahdaldobian.com/store_new/index.php?route=account/register")
                 .setPriority(Priority.HIGH)
+                .addBodyParameter("firstname", fname)
+                .addBodyParameter("lastname", sname)
                 .addBodyParameter("email", email)
+                .addBodyParameter("telephone", phone)
+                .addBodyParameter("company", company)
+                .addBodyParameter("address_1", address)
+                .addBodyParameter("address_2", address2)
+                .addBodyParameter("city", city)
+                .addBodyParameter("postcode", mail)
+                .addBodyParameter("country_id", countryId+"")
                 .addBodyParameter("password", password)
+                .build()
+                .getAsString(new StringRequestListener() {
+                    @Override
+                    public void onResponse(String response) {
+                        dialog.dismiss();
+                        Log.d(TAG, response.toString());
+
+                        try {
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        dialog.dismiss();
+                        error.printStackTrace();
+                        Toast.makeText(RegisterActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void fetchCountries() {
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setMessage(getString(R.string.please_wait));
+        dialog.setCancelable(false);
+        dialog.show();
+
+        countries = new HashMap<>();
+
+        AndroidNetworking.get(Consts.API_URL + "show/countries.php")
+                .setPriority(Priority.HIGH)
                 .build()
                 .getAsJSONArray(new JSONArrayRequestListener() {
                     @Override
@@ -125,6 +193,67 @@ public class RegisterActivity extends AppCompatActivity {
                         Log.d(TAG, response.toString());
 
                         try {
+
+                            JSONObject json;
+                            for (int i=0;i<response.length();i++) {
+                                json = response.getJSONObject(i);
+                                countries.put(json.getString("name"), json.getInt("country_id"));
+                            }
+
+                            spCountry.setAdapter(
+                                    new ArrayAdapter<>(
+                                            RegisterActivity.this,
+                                            android.R.layout.simple_list_item_1,
+                                            new ArrayList<>(countries.keySet())
+                                    )
+                            );
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        dialog.dismiss();
+                        error.printStackTrace();
+                        Toast.makeText(RegisterActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void fetchZones() {
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setMessage(getString(R.string.please_wait));
+        dialog.setCancelable(false);
+        dialog.show();
+
+        zones = new HashMap<>();
+
+        AndroidNetworking.get(Consts.API_URL + "show/zones.php")
+                .setPriority(Priority.HIGH)
+                .build()
+                .getAsJSONArray(new JSONArrayRequestListener() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        dialog.dismiss();
+                        Log.d(TAG, response.toString());
+
+                        try {
+
+                            JSONObject json;
+                            for (int i=0;i<response.length();i++) {
+                                json = response.getJSONObject(i);
+                                zones.put(json.getString("name"), json.getInt("zone_id"));
+                            }
+
+                            spZone.setAdapter(
+                                    new ArrayAdapter<>(
+                                            RegisterActivity.this,
+                                            android.R.layout.simple_list_item_1,
+                                            new ArrayList<>(zones.keySet())
+                                    )
+                            );
 
                         } catch (Exception e) {
                             e.printStackTrace();
