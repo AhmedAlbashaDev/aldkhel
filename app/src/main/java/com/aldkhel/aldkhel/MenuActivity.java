@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -64,6 +65,8 @@ public class MenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_menu);
 
         expandableListView = findViewById(R.id.expandableListView);
+
+
 
 //        expandableListDetail = loadFakeData();
 //        expandableListTitle = new ArrayList<>(expandableListDetail.keySet());
@@ -144,6 +147,22 @@ public class MenuActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        long id = PreferenceManager.getDefaultSharedPreferences(this)
+                .getLong("id", 0);
+        if (id > 0) {
+            findViewById(R.id.bAccount).setVisibility(View.VISIBLE);
+            findViewById(R.id.bLogin).setVisibility(View.GONE);
+        } else {
+            findViewById(R.id.bAccount).setVisibility(View.GONE);
+            findViewById(R.id.bLogin).setVisibility(View.VISIBLE);
+        }
+
+    }
+
     public void onClick(View view) {
 
         int viewId = view.getId();
@@ -153,7 +172,7 @@ public class MenuActivity extends AppCompatActivity {
         }
 
         if (viewId == R.id.bAccount) {
-
+            startActivity(new Intent(this, ProfileActivity.class));
         }
 
         if (viewId == R.id.bLogin) {

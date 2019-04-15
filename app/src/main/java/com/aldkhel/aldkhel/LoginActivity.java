@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -17,8 +18,10 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONArrayRequestListener;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -113,13 +116,28 @@ public class LoginActivity extends AppCompatActivity {
                 .addBodyParameter("email", email)
                 .addBodyParameter("password", password)
                 .build()
-                .getAsJSONArray(new JSONArrayRequestListener() {
+                .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
-                    public void onResponse(JSONArray response) {
+                    public void onResponse(JSONObject response) {
                         dialog.dismiss();
                         Log.d(TAG, response.toString());
 
                         try {
+
+                            if (response.has("customer_id")) {
+
+                                long id = response.getLong("customer_id");
+                                PreferenceManager.getDefaultSharedPreferences(LoginActivity.this)
+                                        .edit()
+                                        .putLong("id", id)
+                                        .apply();
+
+                                startActivity(new Intent(LoginActivity.this, ProfileActivity.class));
+                                finish();
+
+                            } else {
+                                Toast.makeText(LoginActivity.this, "بيانات الحساب غير مطابقة", Toast.LENGTH_SHORT).show();
+                            }
 
                         } catch (Exception e) {
                             e.printStackTrace();
