@@ -133,7 +133,7 @@
                 android:layout_height="wrap_content"
                 android:background="#efefef"
                 android:padding="10dp"
-                android:hint="الشركة (الشركة)"/>
+                android:hint="الشركة (اختياري)"/>
 
         </android.support.design.widget.TextInputLayout>
 

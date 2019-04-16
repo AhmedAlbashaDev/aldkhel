@@ -2,7 +2,9 @@ package com.aldkhel.aldkhel;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatCheckBox;
 import android.util.Log;
@@ -18,7 +20,7 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONArrayRequestListener;
-import com.androidnetworking.interfaces.StringRequestListener;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -98,6 +100,8 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
+                if (cbNews.isChecked()) news = 1;
+
                 fname = etFirstName.getText().toString();
                 sname = etSecondName.getText().toString();
                 phone = etPhone.getText().toString();
@@ -139,7 +143,7 @@ public class RegisterActivity extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.show();
 
-        AndroidNetworking.post("http://www.fahdaldobian.com/store_new/index.php?route=account/register")
+        AndroidNetworking.post(Consts.API_URL + "write/register.php")
                 .setPriority(Priority.HIGH)
                 .addBodyParameter("firstname", fname)
                 .addBodyParameter("lastname", sname)
@@ -151,15 +155,29 @@ public class RegisterActivity extends AppCompatActivity {
                 .addBodyParameter("city", city)
                 .addBodyParameter("postcode", mail)
                 .addBodyParameter("country_id", countryId+"")
+                .addBodyParameter("zone_id", zoneId+"")
                 .addBodyParameter("password", password)
+                .addBodyParameter("newsletter", news+"")
                 .build()
-                .getAsString(new StringRequestListener() {
+                .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(JSONObject response) {
                         dialog.dismiss();
                         Log.d(TAG, response.toString());
 
                         try {
+
+                            long id = response.getLong("data");
+                            if (id > 0) {
+
+                                PreferenceManager.getDefaultSharedPreferences(RegisterActivity.this)
+                                        .edit()
+                                        .putLong("id", id)
+                                        .apply();
+
+                                startActivity(new Intent(RegisterActivity.this, ProfileActivity.class));
+                                finish();
+                            }
 
                         } catch (Exception e) {
                             e.printStackTrace();
