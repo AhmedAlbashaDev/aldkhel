@@ -11,7 +11,12 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="false"
         android:theme="@style/AppTheme">
-        <activity android:name=".UpdatePersonalActivity"></activity>
+        <activity android:name=".OrderActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".UpdatePersonalActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".ProfileActivity"
             android:screenOrientation="portrait"

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -147,6 +148,13 @@ public class ProductDetailsActivity extends AppCompatActivity {
         bAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                long id = PreferenceManager.getDefaultSharedPreferences(ProductDetailsActivity.this)
+                        .getLong("id", 0);
+                if (id <= 0) {
+                    Toast.makeText(ProductDetailsActivity.this, "عليك تسجيل الدخول اولا", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 if (!available) {
                     Toast.makeText(ProductDetailsActivity.this, "هذا المنتج غير متاح حاليا", Toast.LENGTH_SHORT).show();

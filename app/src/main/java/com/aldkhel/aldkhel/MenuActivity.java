@@ -180,6 +180,14 @@ public class MenuActivity extends AppCompatActivity {
         }
 
         if (viewId == R.id.bCart) {
+
+            long id = PreferenceManager.getDefaultSharedPreferences(MenuActivity.this)
+                    .getLong("id", 0);
+            if (id <= 0) {
+                Toast.makeText(MenuActivity.this, "عليك تسجيل الدخول اولا", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             startActivity(new Intent(this, CartActivity.class));
         }
 

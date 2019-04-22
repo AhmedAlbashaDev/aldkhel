@@ -78,6 +78,6 @@
         android:padding="5dp"
         android:textStyle="bold"
         android:textSize="18sp"
-        android:text="إتمام الطلب"/>
+        android:text="متابعة"/>
 
 </LinearLayout>

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -79,6 +80,14 @@ public class HomeActivity extends AppCompatActivity {
         findViewById(R.id.ivCart).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                long id = PreferenceManager.getDefaultSharedPreferences(HomeActivity.this)
+                        .getLong("id", 0);
+                if (id <= 0) {
+                    Toast.makeText(HomeActivity.this, "عليك تسجيل الدخول اولا", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 startActivity(new Intent(HomeActivity.this, CartActivity.class));
             }
         });
