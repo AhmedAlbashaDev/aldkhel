@@ -26,7 +26,7 @@ import com.aldkhel.aldkhel.utils.SpacesItemDecoration;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
-import com.androidnetworking.interfaces.JSONArrayRequestListener;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.daimajia.slider.library.Animations.DescriptionAnimation;
 import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
@@ -34,6 +34,7 @@ import com.daimajia.slider.library.SliderTypes.TextSliderView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,8 +104,8 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(HomeActivity.this, ProductsActivity.class);
-                i.putExtra("url", Consts.API_URL + "show/products_sold.php?category_id=" + category.getId());
-                i.putExtra("category", category);
+                i.putExtra("url", Consts.API_URL + "feed/rest_api/bestsellers&limit=100");
+                i.putExtra("category", new Category());
                 startActivity(i);
             }
         });
@@ -113,8 +114,8 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(HomeActivity.this, ProductsActivity.class);
-                i.putExtra("url", Consts.API_URL + "show/products_new.php?category_id=" + category.getId());
-                i.putExtra("category", category);
+                i.putExtra("url", Consts.API_URL + "feed/rest_api/latest");
+                i.putExtra("category", new Category());
                 startActivity(i);
             }
         });
@@ -127,8 +128,6 @@ public class HomeActivity extends AppCompatActivity {
                 Log.d(TAG, "Tab " + tab.getPosition() + ": " + tab.getText());
                 category = categories.get(tab.getPosition());
                 Log.d(TAG, "Tab Id " + category.getId());
-                getProducts();
-                getProductsFooter();
             }
 
             @Override
@@ -231,7 +230,10 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         getCategories();
-        getBanners();
+//        getBanners();
+        getProducts();
+        getProductsFooter();
+        getHomeBanners(7);
     }
 
     private void getCategories() {
@@ -244,19 +246,26 @@ public class HomeActivity extends AppCompatActivity {
         categories = new ArrayList<>();
         tabLayout.removeAllTabs();
 
-        AndroidNetworking.get(Consts.API_URL + "show/categories.php")
+        AndroidNetworking.get(Consts.API_URL + "feed/rest_api/categories")
                 .setPriority(Priority.HIGH)
+                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
                 .build()
-                .getAsJSONArray(new JSONArrayRequestListener() {
+                .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
-                    public void onResponse(JSONArray response) {
+                    public void onResponse(JSONObject response) {
                         dialog.dismiss();
                         Log.d(TAG, response.toString());
 
                         try {
 
-                            for (int i=0;i<response.length();i++) {
-                                categories.add(Category.fromJson(response.getJSONObject(i)));
+                            if (response.getInt("success") != 1) {
+                                Toast.makeText(HomeActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            JSONArray data = response.getJSONArray("data");
+                            for (int i=0;i<data.length();i++) {
+                                categories.add(Category.fromJson(data.getJSONObject(i)));
                             }
 
 //                            for (int i=categories.size()-1;i >= 0; i--) {
@@ -295,20 +304,29 @@ public class HomeActivity extends AppCompatActivity {
     private void getProductsFooter() {
 
 
-        AndroidNetworking.get(Consts.API_URL + "show/products_new.php?category_id=" + category.getId())
+        AndroidNetworking.get(Consts.API_URL + "feed/rest_api/latest&limit=10")
                 .setPriority(Priority.HIGH)
+                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
                 .build()
-                .getAsJSONArray(new JSONArrayRequestListener() {
+                .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
-                    public void onResponse(JSONArray response) {
+                    public void onResponse(JSONObject response) {
                         Log.d(TAG, response.toString());
 
                         try {
 
+                            if (response.getInt("success") != 1) {
+                                Toast.makeText(HomeActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            JSONArray data = response.getJSONArray("data");
+
+
                             productsExtra.clear();
 
-                            for (int i=0;i<response.length();i++) {
-                                productsExtra.add(Product.fromJson(response.getJSONObject(i)));
+                            for (int i=0;i<data.length();i++) {
+                                productsExtra.add(Product.fromJson(data.getJSONObject(i)));
                             }
 
                             recyclerViewFooter.setAdapter(newProductsAdapter);
@@ -332,24 +350,80 @@ public class HomeActivity extends AppCompatActivity {
 
 //        final List<String> images = new ArrayList<>();
 
-        AndroidNetworking.get(Consts.API_URL + "show/banners.php")
+        AndroidNetworking.get(Consts.API_URL + "feed/rest_api/banners")
                 .setPriority(Priority.HIGH)
+                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
                 .build()
-                .getAsJSONArray(new JSONArrayRequestListener() {
+                .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
-                    public void onResponse(JSONArray response) {
+                    public void onResponse(JSONObject response) {
                         Log.d(TAG, response.toString());
 
                         try {
 
+                            if (response.getInt("success") != 1) {
+                                Toast.makeText(HomeActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            JSONArray data = response.getJSONArray("data");
+
                             TextSliderView textSliderView;
 
-                            for (int i=0;i<response.length();i++) {
-//                                images.add(response.getJSONObject(i).getString("image"));
+                            for (int i=0;i<data.length();i++) {
+//                                images.add(data.getJSONObject(i).getString("image"));
                                 textSliderView = new TextSliderView(HomeActivity.this);
                                 textSliderView
                                         .description("")
-                                        .image(Consts.BASE_IMAGE + response.getJSONObject(i).getString("image"))
+                                        .image(data.getJSONObject(i).getString("image"))
+                                        .setScaleType(BaseSliderView.ScaleType.Fit);
+                                slider.addSlider(textSliderView);
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        error.printStackTrace();
+                        Toast.makeText(HomeActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+    }
+
+    private void getHomeBanners(long id) {
+
+//        final List<String> images = new ArrayList<>();
+
+        AndroidNetworking.get(Consts.API_URL + "feed/rest_api/banners&id=" + id)
+                .setPriority(Priority.HIGH)
+                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
+
+                        try {
+
+                            if (response.getInt("success") != 1) {
+                                Toast.makeText(HomeActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            JSONArray data = response.getJSONArray("data");
+
+                            TextSliderView textSliderView;
+
+                            for (int i=0;i<data.length();i++) {
+//                                images.add(data.getJSONObject(i).getString("image"));
+                                textSliderView = new TextSliderView(HomeActivity.this);
+                                textSliderView
+                                        .description(data.getJSONObject(i).getString("title"))
+                                        .image(data.getJSONObject(i).getString("image"))
                                         .setScaleType(BaseSliderView.ScaleType.Fit);
                                 slider.addSlider(textSliderView);
                             }
@@ -376,21 +450,29 @@ public class HomeActivity extends AppCompatActivity {
 //        dialog.dismiss();
 
 
-        AndroidNetworking.get(Consts.API_URL + "show/products_sold.php?category_id=" + category.getId())
+        AndroidNetworking.get(Consts.API_URL + "feed/rest_api/bestsellers&limit=10")
                 .setPriority(Priority.HIGH)
+                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
                 .build()
-                .getAsJSONArray(new JSONArrayRequestListener() {
+                .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
-                    public void onResponse(JSONArray response) {
+                    public void onResponse(JSONObject response) {
 //                        dialog.dismiss();
                         Log.d(TAG, response.toString());
 
                         try {
 
+                            if (response.getInt("success") != 1) {
+                                Toast.makeText(HomeActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            JSONArray data = response.getJSONArray("data");
+
                             products.clear();
 
-                            for (int i=0;i<response.length();i++) {
-                                products.add(Product.fromJson(response.getJSONObject(i)));
+                            for (int i=0;i<data.length();i++) {
+                                products.add(Product.fromJson(data.getJSONObject(i)));
                             }
 
                             recyclerView.setAdapter(mostSoldProductsAdapter);

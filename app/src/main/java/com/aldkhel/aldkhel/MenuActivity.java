@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,10 +17,11 @@ import android.widget.Toast;
 
 import com.aldkhel.aldkhel.models.Category;
 import com.aldkhel.aldkhel.utils.Consts;
+import com.aldkhel.aldkhel.utils.Utils;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
-import com.androidnetworking.interfaces.JSONArrayRequestListener;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -128,7 +128,7 @@ public class MenuActivity extends AppCompatActivity {
                 if (categoriesMap.get(title).size() == 0) {
 
                     Intent i = new Intent(MenuActivity.this, ProductsActivity.class);
-                    i.putExtra("url", Consts.API_URL + "show/products_new.php?category_id=" + category.getId());
+                    i.putExtra("url", Consts.API_URL + "feed/rest_api/products&category=" + category.getId());
                     i.putExtra("category", category);
                     startActivity(i);
 
@@ -151,9 +151,7 @@ public class MenuActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        long id = PreferenceManager.getDefaultSharedPreferences(this)
-                .getLong("id", 0);
-        if (id > 0) {
+        if (Utils.isUserLoggedIn(this)) {
             findViewById(R.id.bAccount).setVisibility(View.VISIBLE);
             findViewById(R.id.bLogin).setVisibility(View.GONE);
         } else {
@@ -181,9 +179,7 @@ public class MenuActivity extends AppCompatActivity {
 
         if (viewId == R.id.bCart) {
 
-            long id = PreferenceManager.getDefaultSharedPreferences(MenuActivity.this)
-                    .getLong("id", 0);
-            if (id <= 0) {
+            if (!Utils.isUserLoggedIn(this)) {
                 Toast.makeText(MenuActivity.this, "عليك تسجيل الدخول اولا", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -200,24 +196,32 @@ public class MenuActivity extends AppCompatActivity {
 
         categoriesMap = new HashMap<>();
 
-        AndroidNetworking.get(Consts.API_URL + "show/subcates.php")
+        AndroidNetworking.get(Consts.API_URL + "feed/rest_api/categories&level=3")
                 .setPriority(Priority.HIGH)
+                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
                 .build()
-                .getAsJSONArray(new JSONArrayRequestListener() {
+                .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
-                    public void onResponse(JSONArray response) {
+                    public void onResponse(JSONObject response) {
                         Log.d(TAG, response.toString());
 
                         try {
 
-                            for (int i=0;i<response.length();i++) {
+                            if (response.getInt("success") != 1) {
+                                Toast.makeText(MenuActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            JSONArray data = response.getJSONArray("data");
+
+                            for (int i=0;i<data.length();i++) {
                                 List<String> names = new ArrayList<>();
                                 List<Long> ids = new ArrayList<>();
 
                                 List<Category> categories = new ArrayList<>();
 
-                                JSONObject json = response.getJSONObject(i);
-                                JSONArray subcategory = json.getJSONArray("subcategoryone");
+                                JSONObject json = data.getJSONObject(i);
+                                JSONArray subcategory = json.getJSONArray("categories");
 
 
 
@@ -230,15 +234,15 @@ public class MenuActivity extends AppCompatActivity {
 
                                     ArrayList<Category> subc = new ArrayList<>();
 
-                                    for (int c=0;c<temp.getJSONArray("subcategorytwo").length();c++) {
-                                        JSONObject cc = temp.getJSONArray("subcategorytwo").getJSONObject(c);
+                                    for (int c=0;c<temp.getJSONArray("categories").length();c++) {
+                                        JSONObject cc = temp.getJSONArray("categories").getJSONObject(c);
                                         subc.add(Category.fromJson(cc));
                                     }
 
 
                                     Category category = Category.fromJson(temp);
                                     category.setSubCategories(subc);
-                                    category.setJsonString(temp.getJSONArray("subcategorytwo").toString());
+                                    category.setJsonString(temp.getJSONArray("categories").toString());
                                     categories.add(category);
 
                                 }
@@ -266,33 +270,6 @@ public class MenuActivity extends AppCompatActivity {
                         Toast.makeText(MenuActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
                     }
                 });
-
-    }
-
-    private HashMap<String, List<String>> loadFakeData() {
-
-        HashMap<String, List<String>> expandableListDetail = new HashMap<>();
-
-        List<String> cricket = new ArrayList<>();
-        cricket.add("شاورما");
-        cricket.add("بيرقر");
-        cricket.add("مندي");
-        cricket.add("دجاج");
-
-        List<String> football = new ArrayList<>();
-        football.add("برتقال");
-        football.add("منقة");
-        football.add("جوافة");
-
-        List<String> basketball = new ArrayList<>();
-        basketball.add("بيتزا");
-        basketball.add("فطيرة الهنا");
-
-        expandableListDetail.put("لحمة", cricket);
-        expandableListDetail.put("عصائر", football);
-        expandableListDetail.put("فطائر", basketball);
-
-        return expandableListDetail;
 
     }
 

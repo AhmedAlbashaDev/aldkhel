@@ -1,10 +1,10 @@
 package com.aldkhel.aldkhel;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,10 +23,11 @@ import com.aldkhel.aldkhel.models.Category;
 import com.aldkhel.aldkhel.models.Product;
 import com.aldkhel.aldkhel.utils.Consts;
 import com.aldkhel.aldkhel.utils.DbHelper;
+import com.aldkhel.aldkhel.utils.Utils;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
-import com.androidnetworking.interfaces.JSONArrayRequestListener;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.squareup.picasso.Picasso;
 import com.travijuu.numberpicker.library.Enums.ActionEnum;
 import com.travijuu.numberpicker.library.Interface.ValueChangedListener;
@@ -34,10 +35,9 @@ import com.travijuu.numberpicker.library.NumberPicker;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -47,9 +47,17 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
     private static final String TAG = "ProductDetailsActivity";
 
+    private TextView tvType;
+    private TextView tvExtra;
+    private TextView tvSeenCount;
+
+
     private RecyclerView recyclerView;
     private DbHelper dbHelper;
     private boolean available = true;
+
+
+    private Product product;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -72,11 +80,8 @@ public class ProductDetailsActivity extends AppCompatActivity {
         final ImageView ivImage = findViewById(R.id.ivImage);
         final TextView tvPrice = findViewById(R.id.tvPrice);
         final TextView tvOffer = findViewById(R.id.tvOffer);
-        final TextView tvType = findViewById(R.id.tvType);
-        final TextView tvSeenCount = findViewById(R.id.tvSeenCount);
         final TextView tvStatus = findViewById(R.id.tvStatus);
         final TextView tvPriceTotal = findViewById(R.id.tvPriceTotal);
-        final TextView tvExtra = findViewById(R.id.tvExtra);
         final NumberPicker npQuantity = findViewById(R.id.npQuantity);
         final Button bAdd = findViewById(R.id.bAdd);
         final TextView tvDetails = findViewById(R.id.tvDetails);
@@ -84,22 +89,25 @@ public class ProductDetailsActivity extends AppCompatActivity {
         RotateAnimation rotate = (RotateAnimation) AnimationUtils.loadAnimation(this, R.anim.rotate_animation);
         tvAvailable.setAnimation(rotate);
 
+        tvType = findViewById(R.id.tvType);
+        tvSeenCount = findViewById(R.id.tvSeenCount);
+        tvExtra = findViewById(R.id.tvExtra);
+
         Intent intent = getIntent();
 
-        final Product product = intent.getParcelableExtra("product");
+        product = intent.getParcelableExtra("product");
+        getProductDetails();
 
-        try {
-            available = product.getDateAvailable().before(new Date());
-            Log.wtf(TAG, available + " True");
-            if (!available) {
-                tvAvailable.setVisibility(View.VISIBLE);
-            } else {
-                tvAvailable.setVisibility(View.GONE);
-            }
-        } catch (ParseException e) {
-            available = false;
+
+        available = !product.getStockStatus().equals("غير متوفر");
+
+        Log.wtf(TAG, available + " True");
+        if (!available) {
             tvAvailable.setVisibility(View.VISIBLE);
+        } else {
+            tvAvailable.setVisibility(View.GONE);
         }
+
 
 //        WebView webView = findViewById(R.id.webView);
 //        webView.loadData(product.getDetails(), "text/html", "UTF-8");
@@ -120,7 +128,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
                 .into(ivImage);
 
         tvSeenCount.setText(String.format(getString(R.string.seen_count_format), product.getViewed()));
-        tvStatus.setText(String.format(getString(R.string.status_format), "متوفر"));
+        tvStatus.setText(String.format(getString(R.string.status_format), product.getStockStatus()));
         tvPriceTotal.setText(String.format(getString(R.string.total_price_format),
                 (product.getPrice()*npQuantity.getValue())));
 
@@ -149,9 +157,7 @@ public class ProductDetailsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                long id = PreferenceManager.getDefaultSharedPreferences(ProductDetailsActivity.this)
-                        .getLong("id", 0);
-                if (id <= 0) {
+                if (!Utils.isUserLoggedIn(ProductDetailsActivity.this)) {
                     Toast.makeText(ProductDetailsActivity.this, "عليك تسجيل الدخول اولا", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -175,18 +181,26 @@ public class ProductDetailsActivity extends AppCompatActivity {
 
         final Category category = getIntent().getParcelableExtra("category");
 
-        AndroidNetworking.get(Consts.API_URL + "show/products_new.php?category_id=" + category.getId())
+        AndroidNetworking.get(Consts.API_URL + "feed/rest_api/related&id=" + product.getId())
                 .setPriority(Priority.HIGH)
+                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
                 .build()
-                .getAsJSONArray(new JSONArrayRequestListener() {
+                .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
-                    public void onResponse(JSONArray response) {
+                    public void onResponse(JSONObject response) {
                         Log.d(TAG, response.toString());
 
                         try {
 
-                            for (int i=0;i<response.length();i++) {
-                                products.add(Product.fromJson(response.getJSONObject(i)));
+                            if (response.getInt("success") != 1) {
+                                Toast.makeText(ProductDetailsActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            JSONArray data = response.getJSONArray("data");
+
+                            for (int i=0;i<data.length();i++) {
+                                products.add(Product.fromJson(data.getJSONObject(i)));
                             }
 
                             ProductsAdapter adapter = new ProductsAdapter(ProductDetailsActivity.this, products);
@@ -214,5 +228,53 @@ public class ProductDetailsActivity extends AppCompatActivity {
                 });
 
     }
+
+
+    private void getProductDetails() {
+
+
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setMessage(getString(R.string.please_wait));
+        dialog.setCancelable(false);
+        dialog.show();
+
+        AndroidNetworking.get(Consts.API_URL + "feed/rest_api/products&id=" + product.getId())
+                .setPriority(Priority.HIGH)
+                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        dialog.dismiss();
+                        Log.d(TAG, response.toString());
+
+                        try {
+
+                            if (response.getInt("success") != 1) {
+                                Toast.makeText(ProductDetailsActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            JSONObject data = response.getJSONObject("data");
+
+                            product.setViewed(data.getInt("viewed"));
+                            tvSeenCount.setText(String.format(getString(R.string.seen_count_format), product.getViewed()));
+                            tvType.setText(String.format(getString(R.string.type_format), data.getString("model")));
+                            tvExtra.setText("");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        dialog.dismiss();
+                        error.printStackTrace();
+                        Toast.makeText(ProductDetailsActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+    }
+
 
 }

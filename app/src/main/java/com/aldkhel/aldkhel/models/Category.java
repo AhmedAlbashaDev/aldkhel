@@ -3,8 +3,6 @@ package com.aldkhel.aldkhel.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.aldkhel.aldkhel.utils.Consts;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -69,7 +67,7 @@ public class Category implements Parcelable {
     }
 
     public String getImage() {
-        return Consts.BASE_IMAGE + image;
+        return  image;
     }
 
     public void setImage(String image) {

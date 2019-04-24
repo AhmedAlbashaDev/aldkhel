@@ -101,7 +101,7 @@ public class CategoriesActivity extends AppCompatActivity {
 
                         } else {
                             Intent i = new Intent(CategoriesActivity.this, ProductsActivity.class);
-                            i.putExtra("url", Consts.API_URL + "show/products_new.php?category_id=" + c.getId());
+                            i.putExtra("url", Consts.API_URL + "feed/rest_api/products&category=" + c.getId());
                             i.putExtra("category", c);
                             startActivity(i);
                         }
@@ -109,7 +109,7 @@ public class CategoriesActivity extends AppCompatActivity {
                     } catch (JSONException e) {
 
                         Intent i = new Intent(CategoriesActivity.this, ProductsActivity.class);
-                        i.putExtra("url", Consts.API_URL + "show/products_new.php?category_id=" + c.getId());
+                        i.putExtra("url", Consts.API_URL + "feed/rest_api/products&category=" + c.getId());
                         i.putExtra("category", c);
                         startActivity(i);
 

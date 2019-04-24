@@ -16,8 +16,6 @@ import com.aldkhel.aldkhel.R;
 import com.aldkhel.aldkhel.models.Product;
 import com.squareup.picasso.Picasso;
 
-import java.text.ParseException;
-import java.util.Date;
 import java.util.List;
 
 public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.VH> {
@@ -66,11 +64,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.VH> {
             }
         });
 
-        try {
-            if (product.getDateAvailable().after(new Date())) {
-                holder.tvAvailable.setVisibility(View.VISIBLE);
-            }
-        } catch (ParseException e) {
+        if (product.getStockStatus().equals("غير متوفر")) {
             holder.tvAvailable.setVisibility(View.VISIBLE);
         }
 

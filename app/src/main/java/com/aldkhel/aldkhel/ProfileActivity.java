@@ -14,7 +14,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.aldkhel.aldkhel.models.User;
 import com.aldkhel.aldkhel.utils.Consts;
+import com.aldkhel.aldkhel.utils.Utils;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
@@ -32,8 +34,8 @@ public class ProfileActivity extends AppCompatActivity {
 
     private AppCompatCheckBox cbNews;
 
-    private long userId;
-    private JSONObject json;
+    private User user;
+    private String session;
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -50,8 +52,7 @@ public class ProfileActivity extends AppCompatActivity {
         );
         setContentView(R.layout.activity_profile);
 
-        userId = PreferenceManager.getDefaultSharedPreferences(this)
-                .getLong("id", 0);
+        session = Utils.getSessionId(this);
 
         cbNews = findViewById(R.id.cbNews);
         cbNews.setOnClickListener(new View.OnClickListener() {
@@ -65,10 +66,10 @@ public class ProfileActivity extends AppCompatActivity {
                 progressDialog.setCancelable(false);
                 progressDialog.show();
 
-                AndroidNetworking.post(Consts.API_URL + "write/newsletter.php")
+                AndroidNetworking.post(Consts.API_URL + "rest/account/newsletter&subscribe=" + news)
+                        .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
+                        .addHeaders(Consts.API_SESSION_KEY, session)
                         .setPriority(Priority.HIGH)
-                        .addBodyParameter("customer_id", userId+"")
-                        .addBodyParameter("newsletter", news+"")
                         .build()
                         .getAsJSONObject(new JSONObjectRequestListener() {
                             @Override
@@ -78,11 +79,14 @@ public class ProfileActivity extends AppCompatActivity {
 
                                 try {
 
-                                    if (response.getInt("data") > 0) {
-                                        Toast.makeText(ProfileActivity.this, "تمت العملية بنجاح", Toast.LENGTH_SHORT).show();
-                                    } else {
+                                    if (response.getInt("success") != 1) {
                                         Toast.makeText(ProfileActivity.this, "لم تتم العملية بنجاح", Toast.LENGTH_SHORT).show();
+                                        return;
                                     }
+
+                                    JSONObject data = response.getJSONObject("data");
+
+                                    Toast.makeText(ProfileActivity.this, "تمت العملية بنجاح", Toast.LENGTH_SHORT).show();
 
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -104,7 +108,13 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        fetchData();
+//        fetchData();
+        fillUserData();
+    }
+
+    private void fillUserData() {
+        user = Utils.loadUser(this);
+        cbNews.setChecked(user.getNewsletter() == 1);
     }
 
     public void onClick(View view) {
@@ -113,19 +123,27 @@ public class ProfileActivity extends AppCompatActivity {
 
         if (id == R.id.bAccount) {
             Intent intent = new Intent(this, UpdatePersonalActivity.class);
-            intent.putExtra("json", json.toString());
             startActivity(intent);
         }
 
         if (id == R.id.bLogout) {
 
-            PreferenceManager.getDefaultSharedPreferences(this)
-                    .edit()
-                    .clear()
-                    .apply();
-            Intent intent = new Intent(this, HomeActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(intent);
+            AlertDialog.Builder builder = new AlertDialog.Builder(ProfileActivity.this);
+            builder.setMessage("هل تريد تسجيل الخروج !");
+            builder.setPositiveButton("تاكيد", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                    doLogout();
+                }
+            });
+            builder.setNegativeButton("الغاء", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            builder.show();
 
         }
 
@@ -168,12 +186,19 @@ public class ProfileActivity extends AppCompatActivity {
                 progressDialog.setCancelable(false);
                 progressDialog.show();
 
-                Log.wtf(TAG, "ID: " + userId);
+                JSONObject json = new JSONObject();
+                try {
+                    json.put("password", password);
+                    json.put("confirm", confPassword);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
-                AndroidNetworking.post(Consts.API_URL + "write/change_password.php")
+                AndroidNetworking.put(Consts.API_URL + "rest/account/password")
                         .setPriority(Priority.HIGH)
-                        .addBodyParameter("customer_id", userId+"")
-                        .addBodyParameter("password", password)
+                        .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
+                        .addHeaders(Consts.API_SESSION_KEY, session)
+                        .addJSONObjectBody(json)
                         .build()
                         .getAsJSONObject(new JSONObjectRequestListener() {
                             @Override
@@ -183,11 +208,15 @@ public class ProfileActivity extends AppCompatActivity {
 
                                 try {
 
-                                    if (response.getInt("data") > 0) {
-                                        Toast.makeText(ProfileActivity.this, "تمت العملية بنجاح", Toast.LENGTH_SHORT).show();
-                                    } else {
+                                    if (response.getInt("success") != 1) {
                                         Toast.makeText(ProfileActivity.this, "لم تتم العملية بنجاح", Toast.LENGTH_SHORT).show();
+                                        return;
                                     }
+
+                                    JSONObject data = response.getJSONObject("data");
+
+                                    Toast.makeText(ProfileActivity.this, "تمت العملية بنجاح", Toast.LENGTH_SHORT).show();
+
 
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -220,7 +249,7 @@ public class ProfileActivity extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.show();
 
-        AndroidNetworking.get(Consts.API_URL + "show/customer_details.php?customer_id=" + userId)
+        AndroidNetworking.get(Consts.API_URL + "show/customer_details.php?customer_id=" + user.getId())
                 .build()
                 .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
@@ -228,11 +257,53 @@ public class ProfileActivity extends AppCompatActivity {
                         dialog.dismiss();
                         Log.d(TAG, response.toString());
 
-                        json = response;
+
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        dialog.dismiss();
+                        error.printStackTrace();
+                        Toast.makeText(ProfileActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void doLogout() {
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setMessage(getString(R.string.please_wait));
+        dialog.setCancelable(false);
+        dialog.show();
+
+
+        AndroidNetworking.post(Consts.API_URL + "rest/logout/logout")
+                .setPriority(Priority.HIGH)
+                .addHeaders(Consts.API_SESSION_KEY, session)
+                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        dialog.dismiss();
+                        Log.d(TAG, response.toString());
 
                         try {
-                            cbNews.setChecked(json.getInt("newsletter") == 1);
-                        } catch (JSONException e) {
+
+                            if (response.getInt("success") != 1) {
+                                Toast.makeText(ProfileActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            PreferenceManager.getDefaultSharedPreferences(ProfileActivity.this)
+                                    .edit()
+                                    .clear()
+                                    .apply();
+
+                            Intent intent = new Intent(ProfileActivity.this, HomeActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+
+
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
 
@@ -245,5 +316,6 @@ public class ProfileActivity extends AppCompatActivity {
                     }
                 });
     }
+
 
 }

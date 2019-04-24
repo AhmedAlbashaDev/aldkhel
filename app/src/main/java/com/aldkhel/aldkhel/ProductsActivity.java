@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,10 +20,11 @@ import com.aldkhel.aldkhel.utils.SpacesItemDecoration;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
-import com.androidnetworking.interfaces.JSONArrayRequestListener;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +62,14 @@ public class ProductsActivity extends AppCompatActivity {
         TextView tvCategory = findViewById(R.id.tvCategory);
         tvCategory.setText(category.getName());
 
+        if (category.getName() == null || category.getName().length() == 0) {
+            tvCategory.setVisibility(View.GONE);
+            findViewById(R.id.ivLogo).setVisibility(View.VISIBLE);
+        } else {
+            tvCategory.setVisibility(View.VISIBLE);
+            findViewById(R.id.ivLogo).setVisibility(View.GONE);
+        }
+
         recyclerView = findViewById(R.id.recycle);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
@@ -89,19 +99,27 @@ public class ProductsActivity extends AppCompatActivity {
 
         AndroidNetworking.get(url)
                 .setPriority(Priority.HIGH)
+                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
                 .build()
-                .getAsJSONArray(new JSONArrayRequestListener() {
+                .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
-                    public void onResponse(JSONArray response) {
+                    public void onResponse(JSONObject response) {
                         dialog.dismiss();
                         Log.d(TAG, response.toString());
 
                         try {
 
+                            if (response.getInt("success") != 1) {
+                                Toast.makeText(ProductsActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            JSONArray data = response.getJSONArray("data");
+
                             products.clear();
 
-                            for (int i=0;i<response.length();i++) {
-                                products.add(Product.fromJson(response.getJSONObject(i)));
+                            for (int i=0;i<data.length();i++) {
+                                products.add(Product.fromJson(data.getJSONObject(i)));
                             }
 
                             recyclerView.setAdapter(adapter);

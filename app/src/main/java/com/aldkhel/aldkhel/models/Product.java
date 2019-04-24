@@ -5,14 +5,10 @@ import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.aldkhel.aldkhel.utils.Consts;
 import com.aldkhel.aldkhel.utils.DbHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.text.ParseException;
-import java.util.Date;
 
 public class Product implements Parcelable {
 
@@ -24,7 +20,7 @@ public class Product implements Parcelable {
     private String details;
     private String imageUrl;
     private int viewed;
-    private String dateAvailable;
+    private String stockStatus;
 
     public Product() {}
 
@@ -38,7 +34,8 @@ public class Product implements Parcelable {
         details = in.readString();
         imageUrl = in.readString();
         viewed = in.readInt();
-        dateAvailable = in.readString();
+        stockStatus = in.readString();
+
     }
 
     @Override
@@ -51,7 +48,7 @@ public class Product implements Parcelable {
         dest.writeString(details);
         dest.writeString(imageUrl);
         dest.writeInt(viewed);
-        dest.writeString(dateAvailable);
+        dest.writeString(stockStatus);
     }
 
     @Override
@@ -112,7 +109,7 @@ public class Product implements Parcelable {
     }
 
     public String getImageUrl() {
-        return Consts.BASE_IMAGE + imageUrl;
+        return  imageUrl;
     }
 
     public void setImageUrl(String imageUrl) {
@@ -135,12 +132,12 @@ public class Product implements Parcelable {
         this.quantity = quantity;
     }
 
-    public Date getDateAvailable() throws ParseException {
-        return Consts.dateFormat.parse(dateAvailable);
+    public String getStockStatus() {
+        return stockStatus;
     }
 
-    public void setDateAvailable(String dateAvailable) {
-        this.dateAvailable = dateAvailable;
+    public void setStockStatus(String stockStatus) {
+        this.stockStatus = stockStatus;
     }
 
     public ContentValues toContentValues() {
@@ -174,10 +171,13 @@ public class Product implements Parcelable {
         product.setId(json.getLong("product_id"));
         product.setName(json.getString("name"));
         product.setDetails(json.getString("description"));
-        product.setImageUrl(json.getString("image"));
+        if (json.has("thumb")) {
+            product.setImageUrl(json.getString("thumb"));
+        } else {
+            product.setImageUrl(json.getString("image"));
+        }
         product.setPrice(json.getDouble("price"));
-        product.setViewed(json.getInt("viewed"));
-        product.setDateAvailable(json.getString("date_available"));
+        product.setStockStatus(json.getString("stock_status"));
 //        product.setOffer(json.getDouble("offer"));
         return product;
     }

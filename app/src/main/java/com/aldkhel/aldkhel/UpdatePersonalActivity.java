@@ -9,7 +9,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.aldkhel.aldkhel.models.User;
 import com.aldkhel.aldkhel.utils.Consts;
+import com.aldkhel.aldkhel.utils.Utils;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
@@ -31,6 +33,10 @@ public class UpdatePersonalActivity extends AppCompatActivity {
     private String email;
     private long id;
 
+    private User user;
+
+    private String session;
+
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(CalligraphyContextWrapper.wrap(base));
@@ -46,25 +52,21 @@ public class UpdatePersonalActivity extends AppCompatActivity {
         );
         setContentView(R.layout.activity_update_personal);
 
+        session = Utils.getSessionId(this);
+
         final EditText etFirstName = findViewById(R.id.etFirstName);
         final EditText etSecondName = findViewById(R.id.etSecondName);
         final EditText etPhone = findViewById(R.id.etPhone);
         final EditText etEmail = findViewById(R.id.etEmail);
 
-        try {
 
+        user = Utils.loadUser(this);
+        etFirstName.setText(user.getFirstName());
+        etSecondName.setText(user.getLastName());
+        etPhone.setText(user.getTelephone());
+        etEmail.setText(user.getEmail());
 
-            JSONObject json = new JSONObject(getIntent().getStringExtra("json"));
-            etFirstName.setText(json.getString("firstname"));
-            etSecondName.setText(json.getString("lastname"));
-            etPhone.setText(json.getString("telephone"));
-            etEmail.setText(json.getString("email"));
-
-            id = json.getLong("customer_id");
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        id = user.getId();
 
 
         findViewById(R.id.bUpdate).setOnClickListener(new View.OnClickListener() {
@@ -75,6 +77,11 @@ public class UpdatePersonalActivity extends AppCompatActivity {
                 sname = etSecondName.getText().toString();
                 phone = etPhone.getText().toString();
                 email = etEmail.getText().toString();
+
+                user.setFirstName(fname);
+                user.setLastName(sname);
+                user.setTelephone(phone);
+                user.setEmail(email);
 
                 update();
 
@@ -89,13 +96,18 @@ public class UpdatePersonalActivity extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.show();
 
-        AndroidNetworking.post(Consts.API_URL + "write/update_personal.php")
+        JSONObject json = new JSONObject();
+        try {
+            json = user.toJson();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        AndroidNetworking.put(Consts.API_URL + "rest/account/account")
                 .setPriority(Priority.HIGH)
-                .addBodyParameter("firstname", fname)
-                .addBodyParameter("lastname", sname)
-                .addBodyParameter("email", email)
-                .addBodyParameter("telephone", phone)
-                .addBodyParameter("customer_id", id+"")
+                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
+                .addHeaders(Consts.API_SESSION_KEY, session)
+                .addJSONObjectBody(json)
                 .build()
                 .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
@@ -105,12 +117,15 @@ public class UpdatePersonalActivity extends AppCompatActivity {
 
                         try {
 
-                            if (response.getLong("data") > 0) {
-                                Toast.makeText(UpdatePersonalActivity.this, "تمت العملية بنجاح", Toast.LENGTH_SHORT).show();
-                                finish();
-                            } else {
+                            if (response.getInt("success") != 1) {
                                 Toast.makeText(UpdatePersonalActivity.this, "لم تتم العملية بنجاح", Toast.LENGTH_SHORT).show();
+                                return;
                             }
+
+                            Utils.saveUser(UpdatePersonalActivity.this, user);
+                            Toast.makeText(UpdatePersonalActivity.this, "تمت العملية بنجاح", Toast.LENGTH_SHORT).show();
+                            finish();
+
 
                         } catch (Exception e) {
                             e.printStackTrace();
