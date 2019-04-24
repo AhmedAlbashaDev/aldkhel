@@ -123,6 +123,12 @@ public class ProfileActivity extends AppCompatActivity {
 
         if (id == R.id.bAccount) {
             Intent intent = new Intent(this, UpdatePersonalActivity.class);
+            intent.putExtra("address", user.getAddressId());
+            startActivity(intent);
+        }
+
+        if (id == R.id.bAccount) {
+            Intent intent = new Intent(this, UpdatePersonalActivity.class);
             startActivity(intent);
         }
 
@@ -213,7 +219,7 @@ public class ProfileActivity extends AppCompatActivity {
                                         return;
                                     }
 
-                                    JSONObject data = response.getJSONObject("data");
+//                                    JSONObject data = response.getJSONObject("data");
 
                                     Toast.makeText(ProfileActivity.this, "تمت العملية بنجاح", Toast.LENGTH_SHORT).show();
 

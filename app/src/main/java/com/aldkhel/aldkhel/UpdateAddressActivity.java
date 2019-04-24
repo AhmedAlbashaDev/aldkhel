@@ -3,11 +3,9 @@ package com.aldkhel.aldkhel;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatCheckBox;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -17,7 +15,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.aldkhel.aldkhel.models.User;
 import com.aldkhel.aldkhel.utils.Consts;
 import com.aldkhel.aldkhel.utils.Utils;
 import com.androidnetworking.AndroidNetworking;
@@ -36,32 +33,32 @@ import java.util.Map;
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
-public class RegisterActivity extends AppCompatActivity {
+public class UpdateAddressActivity extends AppCompatActivity {
 
-    private static final String TAG = "RegisterActivity";
+    private static final String TAG = "UpdateAddressActivity";
 
     private Spinner spCountry;
     private Spinner spZone;
+    private EditText etCompany;
+    private EditText etCity;
+    private EditText etAddress;
+    private EditText etAddress2;
+    private EditText etMail;
 
     private Map<String, Integer> countries;
     private Map<String, Integer> zones;
 
-    private String fname;
-    private String sname;
-    private String phone;
-    private String email;
+    private String session;
     private String company;
     private String address;
     private String address2;
     private String mail;
-    private String password;
-    private String confPassword;
     private int countryId;
     private int zoneId;
     private String city;
-    private int news;
 
-    private String session;
+    private long addressId;
+
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -76,90 +73,59 @@ public class RegisterActivity extends AppCompatActivity {
                 .setFontAttrId(R.attr.fontPath)
                 .build()
         );
-        setContentView(R.layout.activity_register);
+        setContentView(R.layout.activity_update_address);
 
         session = Utils.getSessionId(this);
-        if (session.isEmpty()) {
-            requestSessionId();
-        }
 
-        findViewById(R.id.bLogin).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        addressId = getIntent().getLongExtra("address", 0);
 
-        final EditText etFirstName = findViewById(R.id.etFirstName);
-        final EditText etSecondName = findViewById(R.id.etSecondName);
-        final EditText etPhone = findViewById(R.id.etPhone);
-        final EditText etEmail = findViewById(R.id.etEmail);
-        final EditText etCompany = findViewById(R.id.etCompany);
-        final EditText etCity = findViewById(R.id.etCity);
-        final EditText etAddress = findViewById(R.id.etAddress);
-        final EditText etAddress2 = findViewById(R.id.etAddress2);
-        final EditText etMail = findViewById(R.id.etMail);
-        final EditText etPassword = findViewById(R.id.etPassword);
-        final EditText etConfPassword = findViewById(R.id.etConfPassword);
+        etCompany = findViewById(R.id.etCompany);
+        etCity = findViewById(R.id.etCity);
+        etAddress = findViewById(R.id.etAddress);
+        etAddress2 = findViewById(R.id.etAddress2);
+        etMail = findViewById(R.id.etMail);
         spCountry = findViewById(R.id.spCountry);
         spZone = findViewById(R.id.spZone);
-        final AppCompatCheckBox cbNews = findViewById(R.id.cbNews);
-        final AppCompatCheckBox cbAgree = findViewById(R.id.cbAgree);
 
-        findViewById(R.id.tvAgree).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
-                builder.setTitle("الشروط والاحكام");
-                builder.setMessage(getString(R.string.terms));
-                builder.setCancelable(false);
-                builder.setPositiveButton("مواقق", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        cbAgree.setChecked(true);
-                    }
-                });
-                builder.show();
-            }
-        });
-
-        final Button bRegister = findViewById(R.id.bRegister);
-        bRegister.setOnClickListener(new View.OnClickListener() {
+        final Button bUpdate = findViewById(R.id.bUpdate);
+        bUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if (cbNews.isChecked()) news = 1;
-
-                fname = etFirstName.getText().toString();
-                sname = etSecondName.getText().toString();
-                phone = etPhone.getText().toString();
-                email = etEmail.getText().toString();
                 company = etCompany.getText().toString();
                 address = etAddress.getText().toString();
                 address2 = etAddress2.getText().toString();
                 mail = etMail.getText().toString();
                 city = etCity.getText().toString();
-                password = etPassword.getText().toString();
-                confPassword = etConfPassword.getText().toString();
 
                 countryId = countries.get(spCountry.getSelectedItem().toString());
                 zoneId = zones.get(spZone.getSelectedItem().toString());
 
-                if (!password.equals(confPassword)) {
-                    Toast.makeText(RegisterActivity.this, "كلمة المرور غير متطابقة", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                if (!cbAgree.isChecked()) {
-                    Toast.makeText(RegisterActivity.this, "الرجاء الموافقة على الشروط والاحكام", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                doRegister();
+                update();
             }
         });
 
+        findViewById(R.id.bDelete).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(UpdateAddressActivity.this);
+                builder.setMessage("هل تريد اكمال العملية !");
+                builder.setPositiveButton("تاكيد", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        deleteAddressData();
+                    }
+                });
+                builder.setNegativeButton("الغاء", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                builder.show();
+            }
+        });
 
         spCountry.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -173,11 +139,104 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
-        fetchCountries();
 
+        getAddressData();
+
+        fetchCountries();
     }
 
-    private void doRegister() {
+    private void getAddressData() {
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setMessage(getString(R.string.please_wait));
+        dialog.setCancelable(false);
+        dialog.show();
+
+        AndroidNetworking.get(Consts.API_URL + "rest/account/address&id=" + addressId)
+                .setPriority(Priority.HIGH)
+                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
+                .addHeaders(Consts.API_SESSION_KEY, session)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        dialog.dismiss();
+                        Log.d(TAG, response.toString());
+
+                        try {
+
+                            if (response.getInt("success") != 1) {
+                                Toast.makeText(UpdateAddressActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            JSONObject data = response.getJSONObject("data");
+
+//                            spCountry;
+//                            spZone;
+
+                            etCompany.setText(data.getString("company"));
+                            etCity.setText(data.getString("city"));
+                            etAddress.setText(data.getString("address_1"));
+                            etAddress2.setText(data.getString("address_2"));
+                            etMail.setText(data.getString("postcode"));
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        dialog.dismiss();
+                        error.printStackTrace();
+                        Toast.makeText(UpdateAddressActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void deleteAddressData() {
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setMessage(getString(R.string.please_wait));
+        dialog.setCancelable(false);
+        dialog.show();
+
+        AndroidNetworking.delete(Consts.API_URL + "rest/account/address&id=" + addressId)
+                .setPriority(Priority.HIGH)
+                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
+                .addHeaders(Consts.API_SESSION_KEY, session)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        dialog.dismiss();
+                        Log.d(TAG, response.toString());
+
+                        try {
+
+                            if (response.getInt("success") != 1) {
+                                Toast.makeText(UpdateAddressActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            Toast.makeText(UpdateAddressActivity.this, "تمت العملية بنجاح", Toast.LENGTH_SHORT).show();
+                            finish();
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        dialog.dismiss();
+                        error.printStackTrace();
+                        Toast.makeText(UpdateAddressActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+
+    private void update() {
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setMessage(getString(R.string.please_wait));
         dialog.setCancelable(false);
@@ -185,10 +244,6 @@ public class RegisterActivity extends AppCompatActivity {
 
         JSONObject json = new JSONObject();
         try {
-            json.put("firstname", fname);
-            json.put("lastname", sname);
-            json.put("email", email);
-            json.put("telephone", phone);
             json.put("company", company);
             json.put("address_1", address);
             json.put("address_2", address2);
@@ -196,15 +251,12 @@ public class RegisterActivity extends AppCompatActivity {
             json.put("postcode", mail);
             json.put("country_id", countryId+"");
             json.put("zone_id", zoneId+"");
-            json.put("password", password);
-            json.put("newsletter", news+"");
-            json.put("agree", "1");
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
 
-        AndroidNetworking.post(Consts.API_URL + "rest/register/register")
+        AndroidNetworking.put(Consts.API_URL + "rest/account/address&id=" + addressId)
                 .setPriority(Priority.HIGH)
                 .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
                 .addHeaders(Consts.API_SESSION_KEY, session)
@@ -219,15 +271,12 @@ public class RegisterActivity extends AppCompatActivity {
                         try {
 
                             if (response.getInt("success") != 1) {
-                                Toast.makeText(RegisterActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(UpdateAddressActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
                                 return;
                             }
 
-                            JSONObject data = response.getJSONObject("data");
+                            Toast.makeText(UpdateAddressActivity.this, "تم العملية بنجاح", Toast.LENGTH_SHORT).show();
 
-                            Utils.saveUser(RegisterActivity.this, User.fromJson(data));
-
-                            startActivity(new Intent(RegisterActivity.this, ProfileActivity.class));
                             finish();
 
                         } catch (Exception e) {
@@ -239,7 +288,7 @@ public class RegisterActivity extends AppCompatActivity {
                     public void onError(ANError error) {
                         dialog.dismiss();
                         error.printStackTrace();
-                        Toast.makeText(RegisterActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(UpdateAddressActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -265,7 +314,7 @@ public class RegisterActivity extends AppCompatActivity {
                         try {
 
                             if (response.getInt("success") != 1) {
-                                Toast.makeText(RegisterActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(UpdateAddressActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
                                 return;
                             }
 
@@ -280,7 +329,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                             spCountry.setAdapter(
                                     new ArrayAdapter<>(
-                                            RegisterActivity.this,
+                                            UpdateAddressActivity.this,
                                             android.R.layout.simple_list_item_1,
                                             new ArrayList<>(countries.keySet())
                                     )
@@ -295,7 +344,7 @@ public class RegisterActivity extends AppCompatActivity {
                     public void onError(ANError error) {
                         dialog.dismiss();
                         error.printStackTrace();
-                        Toast.makeText(RegisterActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(UpdateAddressActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
                     }
                 });
     }
@@ -321,7 +370,7 @@ public class RegisterActivity extends AppCompatActivity {
                         try {
 
                             if (response.getInt("success") != 1) {
-                                Toast.makeText(RegisterActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(UpdateAddressActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
                                 return;
                             }
 
@@ -335,7 +384,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                             spZone.setAdapter(
                                     new ArrayAdapter<>(
-                                            RegisterActivity.this,
+                                            UpdateAddressActivity.this,
                                             android.R.layout.simple_list_item_1,
                                             new ArrayList<>(zones.keySet())
                                     )
@@ -350,48 +399,7 @@ public class RegisterActivity extends AppCompatActivity {
                     public void onError(ANError error) {
                         dialog.dismiss();
                         error.printStackTrace();
-                        Toast.makeText(RegisterActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
-
-    private void requestSessionId() {
-        final ProgressDialog dialog = new ProgressDialog(this);
-        dialog.setMessage(getString(R.string.please_wait));
-        dialog.setCancelable(false);
-        dialog.show();
-
-        AndroidNetworking.get(Consts.API_URL + "feed/rest_api/session")
-                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
-                .setPriority(Priority.HIGH)
-                .build()
-                .getAsJSONObject(new JSONObjectRequestListener() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        dialog.dismiss();
-                        Log.d(TAG, response.toString());
-
-                        try {
-
-                            if (response.getInt("success") != 1) {
-                                Toast.makeText(RegisterActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
-                                return;
-                            }
-
-                            JSONObject data = response.getJSONObject("data");
-                            session = data.getString("session");
-                            Utils.saveSession(RegisterActivity.this, data.getString("session"));
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-                    @Override
-                    public void onError(ANError error) {
-                        dialog.dismiss();
-                        error.printStackTrace();
-                        Toast.makeText(RegisterActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(UpdateAddressActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
                     }
                 });
     }

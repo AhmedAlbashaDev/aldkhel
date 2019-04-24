@@ -52,6 +52,18 @@
                 android:text="تحريري معلومات حسابي"/>
 
             <TextView
+                android:layout_margin="2dp"
+                android:id="@+id/bAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:onClick="onClick"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/holo_blue_dark"
+                android:text="تعديل العناوين"/>
+
+            <TextView
                 android:id="@+id/bChangePassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
