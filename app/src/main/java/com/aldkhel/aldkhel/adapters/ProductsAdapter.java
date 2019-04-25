@@ -7,8 +7,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
-import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -96,8 +94,8 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.VH> {
             tvPrice = v.findViewById(R.id.tvPrice);
             tvOffer = v.findViewById(R.id.tvOffer);
             tvAvailable = v.findViewById(R.id.tvAvailable);
-            RotateAnimation rotate = (RotateAnimation) AnimationUtils.loadAnimation(context, R.anim.rotate_animation);
-            tvAvailable.setAnimation(rotate);
+//            RotateAnimation rotate = (RotateAnimation) AnimationUtils.loadAnimation(context, R.anim.rotate_animation);
+//            tvAvailable.setAnimation(rotate);
         }
 
     }

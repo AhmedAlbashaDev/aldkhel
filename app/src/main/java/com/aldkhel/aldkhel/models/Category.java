@@ -97,7 +97,11 @@ public class Category implements Parcelable {
 
     public static Category fromJson(JSONObject json) throws JSONException {
         Category category = new Category();
-        category.setId(json.getLong("category_id"));
+        if (json.has("id")) {
+            category.setId(json.getLong("id"));
+        } else {
+            category.setId(json.getLong("category_id"));
+        }
         category.setName(json.getString("name"));
         category.setImage(json.getString("image"));
         return category;

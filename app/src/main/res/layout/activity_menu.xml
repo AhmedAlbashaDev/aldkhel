@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:textStyle="bold"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:onClick="onClick"
         android:textColor="@android:color/black"
         android:text="الرئيسية"/>
@@ -25,7 +25,7 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:textStyle="bold"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:onClick="onClick"
         android:textColor="@android:color/black"
         android:text="حسابي"/>
@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:textStyle="bold"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:onClick="onClick"
         android:textColor="@android:color/black"
         android:text="عربة التسوق"/>
@@ -49,7 +49,7 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         android:textStyle="bold"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:onClick="onClick"
         android:textColor="@android:color/black"
         android:text="تسجيل الدخول"/>
@@ -60,7 +60,7 @@
         android:layout_height="wrap_content"
         android:padding="8dp"
         android:textStyle="bold"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:textColor="@android:color/black"
         android:background="#efefef"
         android:text="الاقسام"/>
@@ -70,7 +70,7 @@
         android:id="@+id/expandableListView"
         android:layout_height="match_parent"
         android:layout_width="match_parent"
-        android:indicatorLeft="?android:attr/expandableListPreferredItemIndicatorLeft"
+        android:indicatorLeft="?android:attr/expandableListPreferredChildIndicatorLeft"
         android:divider="@android:color/darker_gray"
         android:dividerHeight="0.5dp" />
 

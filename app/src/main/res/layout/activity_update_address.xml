@@ -158,47 +158,10 @@
             android:background="#efefef"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="8dp"/>
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_marginTop="5dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/etPassword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#efefef"
-                android:padding="10dp"
-                android:inputType="textPassword"
-                android:gravity="right"
-                android:hint="كلمة المرور"/>
-
-        </android.support.design.widget.TextInputLayout>
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_marginTop="5dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <EditText
-                android:id="@+id/etConfPassword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="#efefef"
-                android:padding="10dp"
-                android:inputType="textPassword"
-                android:gravity="right"
-                android:hint="تاكيد كلمة المرور"/>
-
-        </android.support.design.widget.TextInputLayout>
 
         <Button
             android:layout_marginTop="10dp"
@@ -216,6 +179,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"
+            android:layout_marginBottom="10dp"
             android:id="@+id/bDelete"
             android:layout_width="match_parent"
             android:layout_height="40dp"

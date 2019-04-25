@@ -34,7 +34,7 @@ final public class Utils {
     }
 
     public static boolean isUserLoggedIn(Context context) {
-        return loadUser(context) != null;
+        return getSessionId(context) != null && !getSessionId(context).isEmpty();
     }
 
     public static String getSessionId(Context context) {

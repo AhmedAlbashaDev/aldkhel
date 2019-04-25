@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
+import android.os.Handler;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -15,6 +15,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -23,6 +24,7 @@ import com.aldkhel.aldkhel.models.Category;
 import com.aldkhel.aldkhel.models.Product;
 import com.aldkhel.aldkhel.utils.Consts;
 import com.aldkhel.aldkhel.utils.SpacesItemDecoration;
+import com.aldkhel.aldkhel.utils.Utils;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
@@ -82,9 +84,8 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                long id = PreferenceManager.getDefaultSharedPreferences(HomeActivity.this)
-                        .getLong("id", 0);
-                if (id <= 0) {
+
+                if (!Utils.isUserLoggedIn(HomeActivity.this)) {
                     Toast.makeText(HomeActivity.this, "عليك تسجيل الدخول اولا", Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -246,7 +247,7 @@ public class HomeActivity extends AppCompatActivity {
         categories = new ArrayList<>();
         tabLayout.removeAllTabs();
 
-        AndroidNetworking.get(Consts.API_URL + "feed/rest_api/categories")
+        AndroidNetworking.get(Consts.API_URL + "feed/rest_api/categories&extended=1&limit=50")
                 .setPriority(Priority.HIGH)
                 .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
                 .build()
@@ -268,23 +269,23 @@ public class HomeActivity extends AppCompatActivity {
                                 categories.add(Category.fromJson(data.getJSONObject(i)));
                             }
 
-//                            for (int i=categories.size()-1;i >= 0; i--) {
-//                                tabLayout.addTab(tabLayout.newTab().setText(categories.get(i).getName()));
-//                            }
-
-                            for (int i=0;i< categories.size(); i++) {
+                            for (int i=categories.size()-1;i >= 0; i--) {
                                 tabLayout.addTab(tabLayout.newTab().setText(categories.get(i).getName()));
                             }
 
-//                            new Handler().post(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    int index = categories.size()-1;
-//                                    tabLayout.getTabAt(index).select();
-//                                    int right = ((ViewGroup) tabLayout.getChildAt(0)).getChildAt(index).getRight();
-//                                    tabLayout.scrollTo(right,0);
-//                                }
-//                            });
+//                            for (int i=0;i< categories.size(); i++) {
+//                                tabLayout.addTab(tabLayout.newTab().setText(categories.get(i).getName()));
+//                            }
+
+                            new Handler().post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    int index = categories.size()-1;
+                                    tabLayout.getTabAt(index).select();
+                                    int right = ((ViewGroup) tabLayout.getChildAt(0)).getChildAt(index).getRight();
+                                    tabLayout.scrollTo(right,0);
+                                }
+                            });
 
                         } catch (JSONException e) {
                             e.printStackTrace();

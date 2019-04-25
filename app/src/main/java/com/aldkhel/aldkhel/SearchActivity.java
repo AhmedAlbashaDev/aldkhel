@@ -20,10 +20,11 @@ import com.aldkhel.aldkhel.utils.SpacesItemDecoration;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
-import com.androidnetworking.interfaces.JSONArrayRequestListener;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -111,18 +112,25 @@ public class SearchActivity extends AppCompatActivity {
     private void doSearch(String search) {
 
 
-        AndroidNetworking.get(Consts.API_URL + "show/search_products.php?search=" + URLEncoder.encode(search))
+        AndroidNetworking.get(Consts.API_URL + "feed/rest_api/products&search=" + URLEncoder.encode(search))
                 .setPriority(Priority.HIGH)
+                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
                 .build()
-                .getAsJSONArray(new JSONArrayRequestListener() {
+                .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
-                    public void onResponse(JSONArray response) {
+                    public void onResponse(JSONObject response) {
                         Log.d(TAG, response.toString());
 
                         try {
 
-                            for (int i=0;i<response.length();i++) {
-                                products.add(Product.fromJson(response.getJSONObject(i)));
+                            if (response.getInt("success") != 1) {
+                                return;
+                            }
+
+                            JSONArray data = response.getJSONArray("data");
+
+                            for (int i=0;i<data.length();i++) {
+                                products.add(Product.fromJson(data.getJSONObject(i)));
                             }
 
                             adapter.notifyDataSetChanged();

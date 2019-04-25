@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.aldkhel.aldkhel.models.User;
 import com.aldkhel.aldkhel.utils.Consts;
+import com.aldkhel.aldkhel.utils.DbHelper;
 import com.aldkhel.aldkhel.utils.Utils;
 import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
@@ -59,14 +60,14 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                int news = cbNews.isChecked() ? 1 : 0;
+                final int news = cbNews.isChecked() ? 1 : 0;
 
                 final ProgressDialog progressDialog = new ProgressDialog(ProfileActivity.this);
                 progressDialog.setMessage(getString(R.string.please_wait));
                 progressDialog.setCancelable(false);
                 progressDialog.show();
 
-                AndroidNetworking.post(Consts.API_URL + "rest/account/newsletter&subscribe=" + news)
+                AndroidNetworking.put(Consts.API_URL + "rest/account/newsletter&subscribe=" + news)
                         .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
                         .addHeaders(Consts.API_SESSION_KEY, session)
                         .setPriority(Priority.HIGH)
@@ -84,10 +85,11 @@ public class ProfileActivity extends AppCompatActivity {
                                         return;
                                     }
 
-                                    JSONObject data = response.getJSONObject("data");
-
-                                    Toast.makeText(ProfileActivity.this, "تمت العملية بنجاح", Toast.LENGTH_SHORT).show();
-
+                                    if (news == 1) {
+                                        Toast.makeText(ProfileActivity.this, "تمت عملية الاشتراك", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(ProfileActivity.this, "تم الغاء الاشتراك", Toast.LENGTH_SHORT).show();
+                                    }
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -108,8 +110,8 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-//        fetchData();
-        fillUserData();
+        fetchData();
+//        fillUserData();
     }
 
     private void fillUserData() {
@@ -121,14 +123,15 @@ public class ProfileActivity extends AppCompatActivity {
 
         int id = view.getId();
 
-        if (id == R.id.bAccount) {
-            Intent intent = new Intent(this, UpdatePersonalActivity.class);
+        if (id == R.id.bAddress) {
+            Intent intent = new Intent(this, UpdateAddressActivity.class);
             intent.putExtra("address", user.getAddressId());
             startActivity(intent);
         }
 
         if (id == R.id.bAccount) {
             Intent intent = new Intent(this, UpdatePersonalActivity.class);
+            intent.putExtra("user", user);
             startActivity(intent);
         }
 
@@ -255,13 +258,33 @@ public class ProfileActivity extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.show();
 
-        AndroidNetworking.get(Consts.API_URL + "show/customer_details.php?customer_id=" + user.getId())
+        AndroidNetworking.get(Consts.API_URL + "rest/account/account")
+                .setPriority(Priority.HIGH)
+                .addHeaders(Consts.API_SESSION_KEY, session)
+                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
                 .build()
                 .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
                     public void onResponse(JSONObject response) {
                         dialog.dismiss();
                         Log.d(TAG, response.toString());
+
+                        try {
+
+                            if (response.getInt("success") != 1) {
+                                Toast.makeText(ProfileActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            JSONObject data = response.getJSONObject("data");
+
+                            user = User.fromJson(data);
+
+                            cbNews.setChecked(user.getNewsletter() == 1);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
 
 
                     }
@@ -280,6 +303,7 @@ public class ProfileActivity extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.show();
 
+        new DbHelper(this).deleteAllProducts();
 
         AndroidNetworking.post(Consts.API_URL + "rest/logout/logout")
                 .setPriority(Priority.HIGH)

@@ -2,7 +2,6 @@ package com.aldkhel.aldkhel;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -344,7 +343,6 @@ public class MenuActivity extends AppCompatActivity {
             }
             TextView listTitleTextView = (TextView) convertView
                     .findViewById(R.id.listTitle);
-            listTitleTextView.setTypeface(null, Typeface.BOLD);
             listTitleTextView.setText(listTitle);
             return convertView;
         }

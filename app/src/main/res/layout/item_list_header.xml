@@ -10,8 +10,8 @@
         android:paddingRight="?android:attr/expandableListPreferredItemPaddingLeft"
         android:textColor="@android:color/black"
         android:text="item"
-        android:textStyle="bold"
-        android:textSize="20sp"
+        android:gravity="right"
+        android:textSize="16sp"
         android:padding="10dp"
         android:paddingBottom="10dp" />
 

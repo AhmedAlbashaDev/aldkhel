@@ -59,6 +59,7 @@ public class UpdateAddressActivity extends AppCompatActivity {
 
     private long addressId;
 
+    private String country = "";
 
     @Override
     protected void attachBaseContext(Context base) {
@@ -105,6 +106,7 @@ public class UpdateAddressActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.bDelete).setVisibility(View.GONE);
         findViewById(R.id.bDelete).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,7 +144,7 @@ public class UpdateAddressActivity extends AppCompatActivity {
 
         getAddressData();
 
-        fetchCountries();
+
     }
 
     private void getAddressData() {
@@ -174,11 +176,14 @@ public class UpdateAddressActivity extends AppCompatActivity {
 //                            spCountry;
 //                            spZone;
 
+                            country = data.getString("country");
                             etCompany.setText(data.getString("company"));
                             etCity.setText(data.getString("city"));
                             etAddress.setText(data.getString("address_1"));
                             etAddress2.setText(data.getString("address_2"));
                             etMail.setText(data.getString("postcode"));
+
+                            fetchCountries();
 
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -327,13 +332,21 @@ public class UpdateAddressActivity extends AppCompatActivity {
                                 countries.put(json.getString("name"), json.getInt("country_id"));
                             }
 
+                            ArrayList<String> arrayList = new ArrayList<>(countries.keySet());
+
                             spCountry.setAdapter(
                                     new ArrayAdapter<>(
                                             UpdateAddressActivity.this,
                                             android.R.layout.simple_list_item_1,
-                                            new ArrayList<>(countries.keySet())
+                                            arrayList
                                     )
                             );
+
+                            int index = 0;
+                            for (int i=0;i<arrayList.size();i++) {
+                                if (arrayList.get(i).equals(country)) index = i;
+                            }
+                            spCountry.setSelection(index);
 
                         } catch (Exception e) {
                             e.printStackTrace();

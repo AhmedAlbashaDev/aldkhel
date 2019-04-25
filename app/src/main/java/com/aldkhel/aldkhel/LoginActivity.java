@@ -12,7 +12,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.aldkhel.aldkhel.models.User;
 import com.aldkhel.aldkhel.utils.Consts;
 import com.aldkhel.aldkhel.utils.Utils;
 import com.androidnetworking.AndroidNetworking;
@@ -88,7 +87,9 @@ public class LoginActivity extends AppCompatActivity {
         findViewById(R.id.bRegister).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+                Intent i = new Intent(LoginActivity.this, RegisterActivity.class);
+                i.putExtra("session", session);
+                startActivity(i);
             }
         });
 
@@ -147,16 +148,13 @@ public class LoginActivity extends AppCompatActivity {
 
                             JSONObject data = response.getJSONObject("data");
 
-                            if (data.has("customer_id")) {
+//                            Utils.saveUser(LoginActivity.this, User.fromJson(data));
 
-                                Utils.saveUser(LoginActivity.this, User.fromJson(data));
+                            startActivity(new Intent(LoginActivity.this, ProfileActivity.class));
+                            finish();
 
-                                startActivity(new Intent(LoginActivity.this, ProfileActivity.class));
-                                finish();
+                            Utils.saveSession(LoginActivity.this, session);
 
-                            } else {
-                                Toast.makeText(LoginActivity.this, "بيانات الحساب غير مطابقة", Toast.LENGTH_SHORT).show();
-                            }
 
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -232,7 +230,6 @@ public class LoginActivity extends AppCompatActivity {
 
                             JSONObject data = response.getJSONObject("data");
                             session = data.getString("session");
-                            Utils.saveSession(LoginActivity.this, data.getString("session"));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

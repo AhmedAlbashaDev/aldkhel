@@ -39,11 +39,10 @@
             android:layout_height="wrap_content">
 
             <TextView
+                android:visibility="gone"
                 android:layout_marginRight="10dp"
                 android:layout_marginTop="20dp"
                 android:layout_gravity="right"
-                android:visibility="visible"
-                android:id="@+id/tvAvailable"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/white"
@@ -93,6 +92,17 @@
                     android:textStyle="bold"
                     android:gravity="center"
                     android:textSize="22sp"/>
+
+                <TextView
+                    android:layout_marginTop="5dp"
+                    android:id="@+id/tvAvailable"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/holo_red_dark"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:text="غير متوفر حاليا"
+                    android:textSize="16sp"/>
 
             </LinearLayout>
 

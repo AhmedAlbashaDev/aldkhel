@@ -60,7 +60,7 @@ public class UpdatePersonalActivity extends AppCompatActivity {
         final EditText etEmail = findViewById(R.id.etEmail);
 
 
-        user = Utils.loadUser(this);
+        user = getIntent().getParcelableExtra("user");
         etFirstName.setText(user.getFirstName());
         etSecondName.setText(user.getLastName());
         etPhone.setText(user.getTelephone());

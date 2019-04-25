@@ -17,7 +17,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.aldkhel.aldkhel.models.User;
 import com.aldkhel.aldkhel.utils.Consts;
 import com.aldkhel.aldkhel.utils.Utils;
 import com.androidnetworking.AndroidNetworking;
@@ -78,10 +77,7 @@ public class RegisterActivity extends AppCompatActivity {
         );
         setContentView(R.layout.activity_register);
 
-        session = Utils.getSessionId(this);
-        if (session.isEmpty()) {
-            requestSessionId();
-        }
+        session = getIntent().getStringExtra("session");
 
         findViewById(R.id.bLogin).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -190,6 +186,7 @@ public class RegisterActivity extends AppCompatActivity {
             json.put("email", email);
             json.put("telephone", phone);
             json.put("company", company);
+            json.put("company_id", company);
             json.put("address_1", address);
             json.put("address_2", address2);
             json.put("city", city);
@@ -197,8 +194,11 @@ public class RegisterActivity extends AppCompatActivity {
             json.put("country_id", countryId+"");
             json.put("zone_id", zoneId+"");
             json.put("password", password);
+            json.put("confirm", confPassword);
             json.put("newsletter", news+"");
             json.put("agree", "1");
+            json.put("tax_id", "1");
+            json.put("fax", "");
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -206,8 +206,8 @@ public class RegisterActivity extends AppCompatActivity {
 
         AndroidNetworking.post(Consts.API_URL + "rest/register/register")
                 .setPriority(Priority.HIGH)
-                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
                 .addHeaders(Consts.API_SESSION_KEY, session)
+                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
                 .addJSONObjectBody(json)
                 .build()
                 .getAsJSONObject(new JSONObjectRequestListener() {
@@ -223,10 +223,12 @@ public class RegisterActivity extends AppCompatActivity {
                                 return;
                             }
 
-                            JSONObject data = response.getJSONObject("data");
+                            Toast.makeText(RegisterActivity.this, "تم تسجيل الدخول بنجاح مرحبا بك", Toast.LENGTH_SHORT).show();
 
-                            Utils.saveUser(RegisterActivity.this, User.fromJson(data));
+//                            JSONObject data = response.getJSONObject("data");
 
+//                            Utils.saveUser(RegisterActivity.this, User.fromJson(data));
+                            Utils.saveSession(RegisterActivity.this, session);
                             startActivity(new Intent(RegisterActivity.this, ProfileActivity.class));
                             finish();
 
@@ -381,7 +383,6 @@ public class RegisterActivity extends AppCompatActivity {
 
                             JSONObject data = response.getJSONObject("data");
                             session = data.getString("session");
-                            Utils.saveSession(RegisterActivity.this, data.getString("session"));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }

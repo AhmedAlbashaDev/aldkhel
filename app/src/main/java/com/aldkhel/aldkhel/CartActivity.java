@@ -173,10 +173,9 @@ public class CartActivity extends AppCompatActivity {
             final Product product = products.get(position);
 
             Picasso.with(CartActivity.this)
-                    .load(product.getImageUrl().replaceFirst("http://fahdaldobian.com/store_org/image/", ""))
+                    .load(product.getImageUrl())
                     .into(holder.ivImage);
 
-            Log.wtf(TAG, product.getImageUrl().replaceFirst("http://fahdaldobian.com/store_org/image/", "") + " IMG");
             holder.tvName.setText(product.getName());
             holder.npQuantity.setValue(product.getQuantity());
             double price = product.getOffer() > 0 ? product.getOffer() : product.getPrice();

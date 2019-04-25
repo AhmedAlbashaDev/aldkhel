@@ -11,8 +11,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.AnimationUtils;
-import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -86,8 +84,8 @@ public class ProductDetailsActivity extends AppCompatActivity {
         final Button bAdd = findViewById(R.id.bAdd);
         final TextView tvDetails = findViewById(R.id.tvDetails);
         TextView tvAvailable = findViewById(R.id.tvAvailable);
-        RotateAnimation rotate = (RotateAnimation) AnimationUtils.loadAnimation(this, R.anim.rotate_animation);
-        tvAvailable.setAnimation(rotate);
+//        RotateAnimation rotate = (RotateAnimation) AnimationUtils.loadAnimation(this, R.anim.rotate_animation);
+//        tvAvailable.setAnimation(rotate);
 
         tvType = findViewById(R.id.tvType);
         tvSeenCount = findViewById(R.id.tvSeenCount);
