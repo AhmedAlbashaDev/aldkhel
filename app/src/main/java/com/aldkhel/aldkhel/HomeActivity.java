@@ -168,7 +168,7 @@ public class HomeActivity extends AppCompatActivity {
         recyclerViewFooter.setLayoutManager(new GridLayoutManager(this, 2));
         recyclerViewFooter.addItemDecoration(new SpacesItemDecoration(3));
 //        recyclerViewFooter.stopScroll();
-        recyclerView.setNestedScrollingEnabled(false);
+//        recyclerView.setNestedScrollingEnabled(false);
 
         newProductsAdapter = new ProductsAdapter(this, productsExtra);
         newProductsAdapter.setCallback(new ProductsAdapter.ProductCallback() {

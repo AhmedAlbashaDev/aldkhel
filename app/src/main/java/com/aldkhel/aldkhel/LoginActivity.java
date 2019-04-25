@@ -176,11 +176,18 @@ public class LoginActivity extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.show();
 
-        AndroidNetworking.post(Consts.API_URL + "write/forget_password.php")
+        JSONObject json = new JSONObject();
+        try {
+            json.put("email", email);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        AndroidNetworking.post(Consts.API_URL + "rest/forgotten/forgotten")
                 .setPriority(Priority.HIGH)
                 .addHeaders(Consts.API_SESSION_KEY, session)
                 .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
-                .addBodyParameter("email", email)
+                .addJSONObjectBody(json)
                 .build()
                 .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
@@ -190,6 +197,12 @@ public class LoginActivity extends AppCompatActivity {
 
                         try {
 
+                            if (response.getInt("success") != 1) {
+                                Toast.makeText(LoginActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            Toast.makeText(LoginActivity.this, "تم ارسال رابط علي بريدك الالكتروني", Toast.LENGTH_SHORT).show();
 
                         } catch (Exception e) {
                             e.printStackTrace();
