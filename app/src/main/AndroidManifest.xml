@@ -11,9 +11,13 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="false"
         android:theme="@style/AppTheme">
-        <activity android:name=".UpdateAddressActivity"
+        <activity android:name=".OrdersHistoryActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".UpdateAddressActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".OrderActivity"
             android:screenOrientation="portrait"

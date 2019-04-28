@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 
 import com.aldkhel.aldkhel.utils.Consts;
+import com.aldkhel.aldkhel.utils.DbHelper;
 import com.aldkhel.aldkhel.utils.Utils;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
@@ -30,6 +31,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
+        Utils.deleteSession(this);
+        new DbHelper(this).deleteAllProducts();
+
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -38,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }, 2000);
 
-        Utils.deleteSession(this);
 
     }
 }

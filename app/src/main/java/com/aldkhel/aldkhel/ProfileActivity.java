@@ -130,6 +130,11 @@ public class ProfileActivity extends AppCompatActivity {
             startActivity(intent);
         }
 
+        if (id == R.id.bOrders) {
+            Intent intent = new Intent(this, OrdersHistoryActivity.class);
+            startActivity(intent);
+        }
+
         if (id == R.id.bLogout) {
 
             AlertDialog.Builder builder = new AlertDialog.Builder(ProfileActivity.this);

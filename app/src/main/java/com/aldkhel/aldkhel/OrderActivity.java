@@ -120,7 +120,9 @@ public class OrderActivity extends AppCompatActivity {
                                 return;
                             }
 
-                            jsonPaymentAddress = response.getJSONArray("addresses").getJSONObject(0);
+                            JSONObject data = response.getJSONObject("data");
+
+                            jsonPaymentAddress = data.getJSONArray("addresses").getJSONObject(0);
 
                             String address = String.format("%s, %s, %s, %s, %s, %s, %s",
                                     jsonPaymentAddress.getString("firstname"),
@@ -185,6 +187,7 @@ public class OrderActivity extends AppCompatActivity {
                     }
                     @Override
                     public void onError(ANError error) {
+                        Log.wtf(TAG, "postPaymentAddress");
                         dialog.dismiss();
                         error.printStackTrace();
                         Toast.makeText(OrderActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
@@ -228,6 +231,7 @@ public class OrderActivity extends AppCompatActivity {
                     }
                     @Override
                     public void onError(ANError error) {
+                        Log.wtf(TAG, "postShippingAddress");
                         dialog.dismiss();
                         error.printStackTrace();
                         Toast.makeText(OrderActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
@@ -270,6 +274,7 @@ public class OrderActivity extends AppCompatActivity {
                     }
                     @Override
                     public void onError(ANError error) {
+                        Log.wtf(TAG, "postConfirm");
                         dialog.dismiss();
                         error.printStackTrace();
                         Toast.makeText(OrderActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
@@ -313,6 +318,7 @@ public class OrderActivity extends AppCompatActivity {
                     }
                     @Override
                     public void onError(ANError error) {
+                        Log.wtf(TAG, "putConfirm");
                         dialog.dismiss();
                         error.printStackTrace();
                         Toast.makeText(OrderActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
@@ -366,6 +372,7 @@ public class OrderActivity extends AppCompatActivity {
                     }
                     @Override
                     public void onError(ANError error) {
+                        Log.wtf(TAG, "postPaymentMethod");
                         dialog.dismiss();
                         error.printStackTrace();
                         Toast.makeText(OrderActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
@@ -417,6 +424,7 @@ public class OrderActivity extends AppCompatActivity {
                     }
                     @Override
                     public void onError(ANError error) {
+                        Log.wtf(TAG, "postShippingMethod");
                         dialog.dismiss();
                         error.printStackTrace();
                         Toast.makeText(OrderActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();

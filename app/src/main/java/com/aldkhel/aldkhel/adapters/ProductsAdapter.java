@@ -64,6 +64,8 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.VH> {
 
         if (product.getStockStatus().equals("غير متوفر")) {
             holder.tvAvailable.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvAvailable.setVisibility(View.GONE);
         }
 
     }
