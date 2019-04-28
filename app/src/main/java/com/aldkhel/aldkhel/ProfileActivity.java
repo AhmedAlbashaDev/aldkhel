@@ -111,13 +111,8 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         fetchData();
-//        fillUserData();
     }
 
-    private void fillUserData() {
-        user = Utils.loadUser(this);
-        cbNews.setChecked(user.getNewsletter() == 1);
-    }
 
     public void onClick(View view) {
 

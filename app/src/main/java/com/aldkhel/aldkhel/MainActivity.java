@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 
 import com.aldkhel.aldkhel.utils.Consts;
+import com.aldkhel.aldkhel.utils.Utils;
 
 import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
 import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
@@ -36,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         }, 2000);
+
+        Utils.deleteSession(this);
 
     }
 }

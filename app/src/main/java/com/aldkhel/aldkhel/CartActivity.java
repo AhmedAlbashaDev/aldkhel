@@ -26,10 +26,17 @@ import android.widget.Toast;
 import com.aldkhel.aldkhel.models.Product;
 import com.aldkhel.aldkhel.utils.Consts;
 import com.aldkhel.aldkhel.utils.DbHelper;
+import com.aldkhel.aldkhel.utils.Utils;
+import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.Priority;
+import com.androidnetworking.error.ANError;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import com.squareup.picasso.Picasso;
 import com.travijuu.numberpicker.library.NumberPicker;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -57,8 +64,7 @@ public class CartActivity extends AppCompatActivity {
     private String city;
     private String clientTime;
 
-
-    private JSONArray jsonArray;
+    private String session;
 
     private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd",
             new Locale("en", "US"));
@@ -78,6 +84,8 @@ public class CartActivity extends AppCompatActivity {
         );
         setContentView(R.layout.activity_cart);
 
+        session = Utils.getSessionId(this);
+
         bSubmit = findViewById(R.id.bSubmit);
         tvTotal = findViewById(R.id.tvTotal);
 
@@ -95,7 +103,7 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                startActivity(new Intent(CartActivity.this, OrderActivity.class));
+                addItemsToCart();
 
             }
         });
@@ -278,6 +286,66 @@ public class CartActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+    }
+
+    private void addItemsToCart() {
+
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setMessage(getString(R.string.please_wait));
+        dialog.setCancelable(false);
+        dialog.show();
+
+        JSONArray jsonArr = new JSONArray();
+        JSONObject json;
+        try {
+            for (Product product : products) {
+                json = new JSONObject();
+                json.put("product_id", product.getId());
+                json.put("quantity", product.getQuantity());
+                jsonArr.put(json);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        AndroidNetworking.post(Consts.API_URL + "rest/cart/bulkcart")
+                .setPriority(Priority.HIGH)
+                .addHeaders(Consts.API_SESSION_KEY, session)
+                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
+                .addJSONArrayBody(jsonArr)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        dialog.dismiss();
+                        Log.d(TAG, response.toString());
+
+                        try {
+
+                            if (response.getInt("success") != 1) {
+                                Toast.makeText(CartActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+
+//                            dbHelper.deleteAllProducts();
+                            Toast.makeText(CartActivity.this, "متابعة الي اكمال الطلب", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(CartActivity.this, OrderActivity.class));
+//                            finish();
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        dialog.dismiss();
+                        error.printStackTrace();
+                        Toast.makeText(CartActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                    }
+                });
 
     }
 

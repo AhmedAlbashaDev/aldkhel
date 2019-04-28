@@ -122,7 +122,6 @@ public class UpdatePersonalActivity extends AppCompatActivity {
                                 return;
                             }
 
-                            Utils.saveUser(UpdatePersonalActivity.this, user);
                             Toast.makeText(UpdatePersonalActivity.this, "تمت العملية بنجاح", Toast.LENGTH_SHORT).show();
                             finish();
 
