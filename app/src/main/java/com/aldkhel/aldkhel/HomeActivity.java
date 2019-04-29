@@ -304,7 +304,6 @@ public class HomeActivity extends AppCompatActivity {
 
     private void getProductsFooter() {
 
-
         AndroidNetworking.get(Consts.API_URL + "feed/rest_api/latest&limit=10")
                 .setPriority(Priority.HIGH)
                 .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)

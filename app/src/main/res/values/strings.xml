@@ -14,6 +14,13 @@
     <string name="cart_price_format">السعر: %.2f ريال</string>
     <string name="cart_quantity">الكمية: %d</string>
 
+    <string name="id_format">رقم الطلب: %d</string>
+    <string name="order_date_format">تاريخ الطلب: %s</string>
+    <string name="pay_method_format">طريقة الدفع: %s</string>
+    <string name="shipping_method_format">طريقة الشحن: %s</string>
+    <string name="order_status_format">حالة الطلب: %s</string>
+    <string name="note_format">ملاحظة: %s</string>
+
     <string name="return_policy">
 
         الإستبدال والإسترجاع

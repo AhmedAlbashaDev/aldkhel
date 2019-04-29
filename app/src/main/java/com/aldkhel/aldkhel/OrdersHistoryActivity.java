@@ -2,6 +2,7 @@ package com.aldkhel.aldkhel;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aldkhel.aldkhel.models.Order;
@@ -65,6 +67,9 @@ public class OrdersHistoryActivity extends AppCompatActivity {
 
         adapter = new Adapter();
         recyclerView.setAdapter(adapter);
+
+
+        getHistoryOrders();
     }
 
     private void getHistoryOrders() {
@@ -72,7 +77,7 @@ public class OrdersHistoryActivity extends AppCompatActivity {
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setMessage(getString(R.string.please_wait));
         dialog.setCancelable(false);
-        dialog.dismiss();
+        dialog.show();
 
         AndroidNetworking.get(Consts.API_URL + "rest/order/orders&limit=&page=")
                 .setPriority(Priority.HIGH)
@@ -95,9 +100,16 @@ public class OrdersHistoryActivity extends AppCompatActivity {
                             JSONArray data = response.getJSONArray("data");
 
                             orders.clear();
-
+                            JSONObject json;
+                            Order order;
                             for (int i=0;i<data.length();i++) {
-                                //TODO: fill orders
+                                json = data.getJSONObject(i);
+                                order = new Order();
+                                order.setId(json.getLong("order_id"));
+                                order.setDate(json.getString("date_added"));
+                                order.setStatus(json.getString("status"));
+                                order.setTotal(json.getDouble("total_raw"));
+                                orders.add(order);
                             }
 
                             recyclerView.setAdapter(adapter);
@@ -131,8 +143,17 @@ public class OrdersHistoryActivity extends AppCompatActivity {
         @Override
         public void onBindViewHolder(@NonNull final VH holder, int position) {
             final Order order = orders.get(position);
-
-
+            holder.tvId.setText(order.getId() + " #");
+            holder.tvStatus.setText(order.getStatus());
+            holder.tvDate.setText(order.getDate());
+            holder.view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(OrdersHistoryActivity.this, OrderDetailsActivity.class);
+                    intent.putExtra("order_id", order.getId());
+                    startActivity(intent);
+                }
+            });
         }
 
         @Override
@@ -142,10 +163,17 @@ public class OrdersHistoryActivity extends AppCompatActivity {
 
         class VH extends RecyclerView.ViewHolder {
 
+            private TextView tvId;
+            private TextView tvStatus;
+            private TextView tvDate;
+            private View view;
 
             VH(View v) {
                 super(v);
-
+                view = v;
+                tvId = v.findViewById(R.id.tvId);
+                tvStatus = v.findViewById(R.id.tvStatus);
+                tvDate = v.findViewById(R.id.tvDate);
             }
         }
 

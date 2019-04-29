@@ -3,6 +3,7 @@ package com.aldkhel.aldkhel;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -85,15 +86,10 @@ public class OrderActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 postPaymentAddress();
-//                postShippingAddress();
-//                postPaymentMethod();
-//                postShippingMethod();
-
             }
         });
 
     }
-
 
     private void getPaymentAddress() {
 
@@ -178,7 +174,7 @@ public class OrderActivity extends AppCompatActivity {
                                 return;
                             }
 
-                            postShippingAddress();
+                            getShippingAddress();
 
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -188,6 +184,49 @@ public class OrderActivity extends AppCompatActivity {
                     @Override
                     public void onError(ANError error) {
                         Log.wtf(TAG, "postPaymentAddress");
+                        dialog.dismiss();
+                        error.printStackTrace();
+                        Toast.makeText(OrderActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+    }
+
+    private void getShippingAddress() {
+
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setMessage(getString(R.string.please_wait));
+        dialog.setCancelable(false);
+        dialog.show();
+
+        AndroidNetworking.get(Consts.API_URL + "rest/shipping_address/shippingaddress")
+                .setPriority(Priority.HIGH)
+                .addHeaders(Consts.API_SESSION_KEY, session)
+                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        dialog.dismiss();
+                        Log.d(TAG, response.toString());
+
+                        try {
+
+                            if (response.getInt("success") != 1) {
+                                Toast.makeText(OrderActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            postShippingAddress();
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        Log.wtf(TAG, "postShippingAddress");
                         dialog.dismiss();
                         error.printStackTrace();
                         Toast.makeText(OrderActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
@@ -222,7 +261,7 @@ public class OrderActivity extends AppCompatActivity {
                                 return;
                             }
 
-                            postPaymentMethod();
+                            getPaymentMethod();
 
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -247,7 +286,7 @@ public class OrderActivity extends AppCompatActivity {
         dialog.setCancelable(false);
         dialog.show();
 
-        AndroidNetworking.get(Consts.API_URL + "rest/confirm/confirm")
+        AndroidNetworking.post(Consts.API_URL + "rest/confirm/confirm")
                 .setPriority(Priority.HIGH)
                 .addHeaders(Consts.API_SESSION_KEY, session)
                 .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
@@ -311,6 +350,10 @@ public class OrderActivity extends AppCompatActivity {
                             dbHelper.deleteAllProducts();
                             Toast.makeText(OrderActivity.this, "تم ارسال الطلب بنجاح", Toast.LENGTH_SHORT).show();
 
+                            Intent intent = new Intent(OrderActivity.this, HomeActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(intent);
+
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -319,6 +362,51 @@ public class OrderActivity extends AppCompatActivity {
                     @Override
                     public void onError(ANError error) {
                         Log.wtf(TAG, "putConfirm");
+                        dialog.dismiss();
+                        error.printStackTrace();
+                        Toast.makeText(OrderActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+    }
+
+    private void getPaymentMethod() {
+
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setMessage(getString(R.string.please_wait));
+        dialog.setCancelable(false);
+        dialog.show();
+
+
+        AndroidNetworking.get(Consts.API_URL + "rest/payment_method/payments")
+                .setPriority(Priority.HIGH)
+                .addHeaders(Consts.API_SESSION_KEY, session)
+                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        dialog.dismiss();
+                        Log.d(TAG, response.toString());
+
+                        try {
+
+                            if (response.getInt("success") != 1) {
+                                Toast.makeText(OrderActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+
+                            postPaymentMethod();
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        Log.wtf(TAG, "postPaymentMethod");
                         dialog.dismiss();
                         error.printStackTrace();
                         Toast.makeText(OrderActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
@@ -363,7 +451,7 @@ public class OrderActivity extends AppCompatActivity {
                             }
 
 
-                            postShippingMethod();
+                            getShippingMethod();
 
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -373,6 +461,49 @@ public class OrderActivity extends AppCompatActivity {
                     @Override
                     public void onError(ANError error) {
                         Log.wtf(TAG, "postPaymentMethod");
+                        dialog.dismiss();
+                        error.printStackTrace();
+                        Toast.makeText(OrderActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+    }
+
+    private void getShippingMethod() {
+
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setMessage(getString(R.string.please_wait));
+        dialog.setCancelable(false);
+        dialog.show();
+
+        AndroidNetworking.get(Consts.API_URL + "rest/shipping_method/shippingmethods")
+                .setPriority(Priority.HIGH)
+                .addHeaders(Consts.API_SESSION_KEY, session)
+                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        dialog.dismiss();
+                        Log.d(TAG, response.toString());
+
+                        try {
+
+                            if (response.getInt("success") != 1) {
+                                Toast.makeText(OrderActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            postShippingMethod();
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        Log.wtf(TAG, "postShippingMethod");
                         dialog.dismiss();
                         error.printStackTrace();
                         Toast.makeText(OrderActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
