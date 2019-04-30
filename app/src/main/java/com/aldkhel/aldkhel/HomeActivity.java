@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.TabLayout;
@@ -17,6 +18,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aldkhel.aldkhel.adapters.ProductsAdapter;
@@ -33,6 +36,7 @@ import com.daimajia.slider.library.Animations.DescriptionAnimation;
 import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.TextSliderView;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -329,8 +333,79 @@ public class HomeActivity extends AppCompatActivity {
                                 productsExtra.add(Product.fromJson(data.getJSONObject(i)));
                             }
 
-                            recyclerViewFooter.setAdapter(newProductsAdapter);
-                            newProductsAdapter.notifyDataSetChanged();
+//                            recyclerViewFooter.setAdapter(newProductsAdapter);
+//                            newProductsAdapter.notifyDataSetChanged();
+
+
+                            LinearLayout linearLayout = findViewById(R.id.linear);
+                            ImageView imageView;
+                            TextView tvName;
+                            TextView tvPrice;
+                            TextView tvOffer;
+                            TextView tvAvailable;
+
+                            LinearLayout row = new LinearLayout(HomeActivity.this);;
+                            View v;
+
+                            for (final Product product : productsExtra) {
+
+                                v = getLayoutInflater().inflate(R.layout.item_product, null);
+
+
+                                imageView = v.findViewById(R.id.ivImage);
+                                tvName = v.findViewById(R.id.tvName);
+                                tvPrice = v.findViewById(R.id.tvPrice);
+                                tvOffer = v.findViewById(R.id.tvOffer);
+                                tvAvailable = v.findViewById(R.id.tvAvailable);
+                                Picasso.with(HomeActivity.this)
+                                        .load(product.getImageUrl())
+                                        .error(R.drawable.logo)
+                                        .fit()
+                                        .into(imageView);
+
+                                tvName.setText(product.getName());
+
+                                tvPrice.setText(String.format(getString(R.string.price_format), product.getPrice()));
+                                tvOffer.setText(String.format(getString(R.string.price_format), product.getOffer()));
+
+                                if (product.getOffer() > 0) {
+                                    tvOffer.setVisibility(View.VISIBLE);
+                                    tvPrice.setPaintFlags(tvPrice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                                } else {
+                                    tvOffer.setVisibility(View.GONE);
+                                }
+
+                                v.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent intent = new Intent(HomeActivity.this, ProductDetailsActivity.class);
+                                        intent.putExtra("product", product);
+                                        intent.putExtra("category", category);
+                                        startActivity(intent);
+                                    }
+                                });
+
+                                if (product.getStockStatus().equals("غير متوفر")) {
+                                    tvAvailable.setVisibility(View.VISIBLE);
+                                } else {
+                                    tvAvailable.setVisibility(View.INVISIBLE);
+                                }
+
+                                ViewGroup.MarginLayoutParams params = new ViewGroup.MarginLayoutParams(ViewGroup.MarginLayoutParams.WRAP_CONTENT, ViewGroup.MarginLayoutParams.WRAP_CONTENT);
+                                params.setMargins(8, 8, 8,8);
+                                v.setLayoutParams(params);
+
+                                if (row.getChildCount() < 2) {
+                                    row.addView(v);
+                                } else {
+                                    linearLayout.addView(row);
+                                    row = new LinearLayout(HomeActivity.this);
+                                }
+
+
+
+                            }
+
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -493,33 +568,6 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
-    private void filterProducts(String search) {
-
-        if (search.length() == 0) {
-            recyclerView.setAdapter(mostSoldProductsAdapter);
-            recyclerViewFooter.setAdapter(newProductsAdapter);
-            return;
-        }
-
-        List<Product> products1 = new ArrayList<>();
-        List<Product> products2 = new ArrayList<>();
-
-        for (Product product : products) {
-            if (product.getName().contains(search)) {
-                products1.add(product);
-            }
-        }
-
-        for (Product product : productsExtra) {
-            if (product.getName().contains(search)) {
-                products2.add(product);
-            }
-        }
-
-        recyclerView.setAdapter(new ProductsAdapter(this, products1));
-        recyclerViewFooter.setAdapter(new ProductsAdapter(this, products2));
-
-    }
 
     @Override
     public void onBackPressed() {
