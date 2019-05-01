@@ -131,14 +131,6 @@
 
         <TextView
             android:layout_marginTop="10dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:text="المنتجات"/>
-
-
-        <TextView
-            android:layout_marginTop="5dp"
             android:id="@+id/tvNote"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -146,6 +138,51 @@
             android:textColor="@android:color/black"
             android:textStyle="bold"/>
 
+        <TextView
+            android:layout_marginTop="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:text="المنتجات"/>
+
+
+
+        <LinearLayout
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:gravity="right"
+                android:layout_weight=".3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="السعر الاجمالي"/>
+
+            <TextView
+                android:gravity="right"
+                android:layout_weight=".3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="سعر المنتج"/>
+
+            <TextView
+                android:gravity="right"
+                android:layout_weight=".3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="الكمية"/>
+
+            <TextView
+                android:gravity="right"
+                android:layout_weight=".3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="الاسم"/>
+
+        </LinearLayout>
 
 
         <android.support.v7.widget.RecyclerView

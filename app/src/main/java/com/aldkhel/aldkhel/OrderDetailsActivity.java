@@ -107,7 +107,7 @@ public class OrderDetailsActivity extends AppCompatActivity {
                             tvDate.setText(String.format(getString(R.string.order_date_format), data.getString("date_added")));
                             tvPaymentMethod.setText(String.format(getString(R.string.pay_method_format), "دفع عند الاستلام"));
                             tvShippingMethod.setText(String.format(getString(R.string.shipping_method_format), "Flat Shipping Rate"));
-                            if (!data.getString("comment").isEmpty()) {
+                            if (!data.getString("comment").isEmpty() && !data.getString("comment").equals("string")) {
                                 tvNote.setText(String.format(getString(R.string.note_format), data.getString("comment")));
                             } else {
                                 tvNote.setVisibility(View.GONE);
