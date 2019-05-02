@@ -205,16 +205,6 @@ public class HomeActivity extends AppCompatActivity {
         sliderFooter.setCustomAnimation(new DescriptionAnimation());
         sliderFooter.setDuration(8000);
 
-        int[] images = {R.drawable.s1, R.drawable.s2, R.drawable.s3};
-
-        for (int image : images) {
-            TextSliderView tsv = new TextSliderView(HomeActivity.this);
-            textSliderView
-                    .description("")
-                    .image(image)
-                    .setScaleType(BaseSliderView.ScaleType.Fit);
-            sliderFooter.addSlider(tsv);
-        }
 
         final SearchView searchView = findViewById(R.id.searchView);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -239,6 +229,7 @@ public class HomeActivity extends AppCompatActivity {
         getProducts();
         getProductsFooter();
         getHomeBanners(7);
+        getCompaniesBanners(8);
     }
 
     private void getCategories() {
@@ -432,7 +423,7 @@ public class HomeActivity extends AppCompatActivity {
                 .getAsJSONObject(new JSONObjectRequestListener() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Log.d(TAG, response.toString());
+                        Log.wtf(TAG, response.toString());
 
                         try {
 
@@ -501,6 +492,54 @@ public class HomeActivity extends AppCompatActivity {
                                         .image(data.getJSONObject(i).getString("image"))
                                         .setScaleType(BaseSliderView.ScaleType.Fit);
                                 slider.addSlider(textSliderView);
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        error.printStackTrace();
+                        Toast.makeText(HomeActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+    }
+
+    private void getCompaniesBanners(long id) {
+
+//        final List<String> images = new ArrayList<>();
+
+        AndroidNetworking.get(Consts.API_URL + "feed/rest_api/banners&id=" + id)
+                .setPriority(Priority.HIGH)
+                .addHeaders(Consts.API_KEY, Consts.API_KEY_VALUE)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d(TAG, response.toString());
+
+                        try {
+
+                            if (response.getInt("success") != 1) {
+                                Toast.makeText(HomeActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            JSONArray data = response.getJSONArray("data");
+
+                            TextSliderView textSliderView;
+
+                            for (int i=0;i<data.length();i++) {
+//                                images.add(data.getJSONObject(i).getString("image"));
+                                textSliderView = new TextSliderView(HomeActivity.this);
+                                textSliderView
+//                                        .description(data.getJSONObject(i).getString("title"))
+                                        .image(data.getJSONObject(i).getString("image"))
+                                        .setScaleType(BaseSliderView.ScaleType.Fit);
+                                sliderFooter.addSlider(textSliderView);
                             }
 
                         } catch (JSONException e) {

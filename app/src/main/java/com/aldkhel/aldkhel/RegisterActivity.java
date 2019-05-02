@@ -220,6 +220,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                             if (response.getInt("success") != 1) {
                                 Toast.makeText(RegisterActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(RegisterActivity.this, "تاكد من بيناتك", Toast.LENGTH_SHORT).show();
                                 return;
                             }
 
@@ -233,6 +234,7 @@ public class RegisterActivity extends AppCompatActivity {
                             finish();
 
                         } catch (Exception e) {
+                            Toast.makeText(RegisterActivity.this, "تاكد من بيناتك", Toast.LENGTH_SHORT).show();
                             e.printStackTrace();
                         }
 
@@ -242,6 +244,7 @@ public class RegisterActivity extends AppCompatActivity {
                         dialog.dismiss();
                         error.printStackTrace();
                         Toast.makeText(RegisterActivity.this, R.string.connection_err, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(RegisterActivity.this, "تاكد من بيناتك", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
